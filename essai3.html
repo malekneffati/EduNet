@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EduNet - Plateforme Éducative</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <style>
+      body {
+        box-sizing: border-box;
+      }
+      .font-poppins {
+        font-family: "Poppins", sans-serif;
+      }
+      .font-opensans {
+        font-family: "Open Sans", sans-serif;
+      }
+      .primary-blue {
+        background-color: #003d7c;
+      }
+      .light-blue {
+        background-color: #0d6efd;
+      }
+      .hover-scale {
+        transition: transform 0.2s;
+      }
+      .hover-scale:hover {
+        transform: scale(1.02);
+      }
+      .card-shadow {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+      .hero-gradient {
+        background: linear-gradient(135deg, #003d7c 0%, #0d6efd 100%);
+      }
+      .sidebar-active {
+        background-color: #e3f2fd;
+        color: #003d7c;
+      }
+    </style>
+  </head>
+  <body class="font-opensans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <h1 class="text-2xl font-bold font-poppins text-blue-900">
+                EduNet
+              </h1>
+            </div>
+            <div class="hidden md:block ml-10">
+              <div class="flex items-baseline space-x-8">
+                <a
+                  href="#"
+                  onclick="showPage('home')"
+                  class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >Accueil</a
+                >
+                <a
+                  href="#"
+                  onclick="showPage('catalog')"
+                  class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >Catalogue des cours</a
+                >
+                <a
+                  href="#"
+                  onclick="showPage('subscription')"
+                  class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >Abonnement</a
+                >
+                <a
+                  href="#"
+                  onclick="showPage('login')"
+                  class="nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  >Connexion</a
+                >
+              </div>
+            </div>
+          </div>
+          <div class="hidden md:block">
+            <button
+              onclick="showPage('register')"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              S'inscrire
+            </button>
+          </div>
+          <div class="md:hidden">
+            <button
+              onclick="toggleMobileMenu()"
+              class="text-gray-700 hover:text-blue-600"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <a
+            href="#"
+            onclick="showPage('home')"
+            class="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            >Accueil</a
+          >
+          <a
+            href="#"
+            onclick="showPage('catalog')"
+            class="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            >Catalogue des cours</a
+          >
+          <a
+            href="#"
+            onclick="showPage('subscription')"
+            class="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            >Abonnement</a
+          >
+          <a
+            href="#"
+            onclick="showPage('login')"
+            class="block px-3 py-2 text-gray-700 hover:text-blue-600"
+            >Connexion</a
+          >
+          <button
+            onclick="showPage('register')"
+            class="w-full text-left px-3 py-2 text-blue-600 font-medium"
+          >
+            S'inscrire
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main id="main-content">
+      <!-- Home Page -->
+      <div id="home-page" class="page-content">
+        <!-- Hero Section -->
+        <section class="hero-gradient text-white py-20">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h1 class="text-4xl md:text-5xl font-bold font-poppins mb-6">
+                  Apprenez autrement avec EduNet.
+                </h1>
+                <p class="text-xl mb-8 opacity-90">
+                  Découvrez des milliers de cours en ligne pour développer vos
+                  compétences et atteindre vos objectifs professionnels.
+                </p>
+                <div class="space-x-4">
+                  <button
+                    onclick="showPage('catalog')"
+                    class="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+                  >
+                    Explorer les cours
+                  </button>
+                  <button
+                    onclick="showPage('subscription')"
+                    class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-900 transition"
+                  >
+                    S'abonner
+                  </button>
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="bg-white bg-opacity-10 rounded-2xl p-8">
+                  <i class="fas fa-graduation-cap text-8xl mb-4"></i>
+                  <p class="text-lg">
+                    Plus de 10,000 étudiants nous font confiance
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Popular Courses -->
+        <section class="py-16 bg-white">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold font-poppins text-gray-900 mb-4">
+                Cours populaires
+              </h2>
+              <p class="text-gray-600 max-w-2xl mx-auto">
+                Découvrez les cours les plus appréciés par notre communauté
+                d'apprenants
+              </p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+              <div
+                class="card-shadow rounded-2xl overflow-hidden hover-scale cursor-pointer"
+                onclick="showPage('course-detail')"
+              >
+                <div
+                  class="bg-gradient-to-r from-blue-500 to-purple-600 h-48 flex items-center justify-center"
+                >
+                  <i class="fas fa-code text-white text-4xl"></i>
+                </div>
+                <div class="p-6">
+                  <h3 class="font-semibold text-lg mb-2">
+                    Développement Web Complet
+                  </h3>
+                  <p class="text-gray-600 mb-4">
+                    Apprenez HTML, CSS, JavaScript et React
+                  </p>
+                  <div class="flex justify-between items-center">
+                    <span class="text-blue-600 font-bold">89 TND</span>
+                    <span class="text-yellow-500"
+                      ><i class="fas fa-star"></i> 4.8</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div
+                class="card-shadow rounded-2xl overflow-hidden hover-scale cursor-pointer"
+              >
+                <div
+                  class="bg-gradient-to-r from-green-500 to-teal-600 h-48 flex items-center justify-center"
+                >
+                  <i class="fas fa-palette text-white text-4xl"></i>
+                </div>
+                <div class="p-6">
+                  <h3 class="font-semibold text-lg mb-2">Design UI/UX</h3>
+                  <p class="text-gray-600 mb-4">
+                    Maîtrisez Figma et les principes du design
+                  </p>
+                  <div class="flex justify-between items-center">
+                    <span class="text-blue-600 font-bold">75 TND</span>
+                    <span class="text-yellow-500"
+                      ><i class="fas fa-star"></i> 4.9</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div
+                class="card-shadow rounded-2xl overflow-hidden hover-scale cursor-pointer"
+              >
+                <div
+                  class="bg-gradient-to-r from-orange-500 to-red-600 h-48 flex items-center justify-center"
+                >
+                  <i class="fas fa-chart-line text-white text-4xl"></i>
+                </div>
+                <div class="p-6">
+                  <h3 class="font-semibold text-lg mb-2">Marketing Digital</h3>
+                  <p class="text-gray-600 mb-4">
+                    SEO, réseaux sociaux et publicité en ligne
+                  </p>
+                  <div class="flex justify-between items-center">
+                    <span class="text-green-600 font-bold">Gratuit</span>
+                    <span class="text-yellow-500"
+                      ><i class="fas fa-star"></i> 4.7</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Why Choose EduNet -->
+        <section class="py-16 bg-gray-50">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+              <h2 class="text-3xl font-bold font-poppins text-gray-900 mb-4">
+                Pourquoi choisir EduNet ?
+              </h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+              <div class="text-center">
+                <div
+                  class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <i class="fas fa-award text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-lg mb-2">Qualité</h3>
+                <p class="text-gray-600">
+                  Cours créés par des experts reconnus dans leur domaine
+                </p>
+              </div>
+              <div class="text-center">
+                <div
+                  class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <i class="fas fa-universal-access text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-lg mb-2">Accessibilité</h3>
+                <p class="text-gray-600">
+                  Apprenez à votre rythme, où que vous soyez
+                </p>
+              </div>
+              <div class="text-center">
+                <div
+                  class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <i class="fas fa-chart-bar text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="font-semibold text-lg mb-2">Suivi</h3>
+                <p class="text-gray-600">
+                  Suivez votre progression et obtenez des certificats
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Login/Register Page -->
+      <div
+        id="login-page"
+        class="page-content hidden min-h-screen flex items-center justify-center py-12 px-4"
+      >
+        <div class="max-w-md w-full">
+          <div class="bg-white rounded-2xl card-shadow p-8">
+            <div class="text-center mb-8">
+              <h2 class="text-3xl font-bold font-poppins text-gray-900">
+                Bienvenue sur EduNet
+              </h2>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex mb-6">
+              <button
+                onclick="switchAuthTab('login')"
+                id="login-tab"
+                class="flex-1 py-2 px-4 text-center border-b-2 border-blue-600 text-blue-600 font-medium"
+              >
+                Connexion
+              </button>
+              <button
+                onclick="switchAuthTab('register')"
+                id="register-tab"
+                class="flex-1 py-2 px-4 text-center border-b-2 border-gray-200 text-gray-500 font-medium"
+              >
+                Inscription
+              </button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form">
+              <form onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                  <label
+                    for="login-email"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Email</label
+                  >
+                  <input
+                    type="email"
+                    id="login-email"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="login-password"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Mot de passe</label
+                  >
+                  <input
+                    type="password"
+                    id="login-password"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium mb-4"
+                >
+                  Se connecter
+                </button>
+              </form>
+              <button
+                onclick="loginWithGoogle()"
+                class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium mb-4"
+              >
+                <i class="fab fa-google mr-2"></i>Se connecter avec Google
+              </button>
+              <div class="text-center">
+                <a href="#" class="text-blue-600 hover:text-blue-700 text-sm"
+                  >Mot de passe oublié ?</a
+                >
+              </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="hidden">
+              <form onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                  <label
+                    for="register-name"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Nom complet</label
+                  >
+                  <input
+                    type="text"
+                    id="register-name"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div class="mb-4">
+                  <label
+                    for="register-email"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Email</label
+                  >
+                  <input
+                    type="email"
+                    id="register-email"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="register-password"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Mot de passe</label
+                  >
+                  <input
+                    type="password"
+                    id="register-password"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium mb-4"
+                >
+                  S'inscrire
+                </button>
+              </form>
+              <button
+                onclick="loginWithGoogle()"
+                class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium"
+              >
+                <i class="fab fa-google mr-2"></i>S'inscrire avec Google
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catalog Page -->
+      <div id="catalog-page" class="page-content hidden py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="mb-8">
+            <h1 class="text-3xl font-bold font-poppins text-gray-900 mb-4">
+              Catalogue des cours
+            </h1>
+
+            <!-- Search and Filters -->
+            <div class="bg-white rounded-lg card-shadow p-6 mb-8">
+              <div class="grid md:grid-cols-4 gap-4">
+                <div class="md:col-span-2">
+                  <label
+                    for="search-courses"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Rechercher un cours</label
+                  >
+                  <input
+                    type="text"
+                    id="search-courses"
+                    placeholder="Tapez votre recherche..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="category-filter"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Catégorie</label
+                  >
+                  <select
+                    id="category-filter"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Toutes les catégories</option>
+                    <option value="development">Développement</option>
+                    <option value="design">Design</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="business">Business</option>
+                  </select>
+                </div>
+                <div>
+                  <label
+                    for="price-filter"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Prix</label
+                  >
+                  <select
+                    id="price-filter"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Tous les prix</option>
+                    <option value="free">Gratuit</option>
+                    <option value="paid">Payant</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Course Grid -->
+            <div
+              class="grid md:grid-cols-3 lg:grid-cols-4 gap-6"
+              id="courses-grid"
+            >
+              <!-- Course cards will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Detail Page -->
+      <div id="course-detail-page" class="page-content hidden py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+              <!-- Course Banner -->
+              <div
+                class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 text-white mb-8"
+              >
+                <div class="flex items-center mb-4">
+                  <span
+                    class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-sm"
+                    >Développement</span
+                  >
+                </div>
+                <h1 class="text-3xl font-bold font-poppins mb-4">
+                  Développement Web Complet
+                </h1>
+                <p class="text-lg opacity-90">
+                  Maîtrisez les technologies web modernes : HTML5, CSS3,
+                  JavaScript ES6+, React et Node.js
+                </p>
+              </div>
+
+              <!-- Course Content -->
+              <div class="bg-white rounded-2xl card-shadow p-8">
+                <h2 class="text-2xl font-bold font-poppins mb-6">
+                  Description du cours
+                </h2>
+                <p class="text-gray-600 mb-6">
+                  Ce cours complet vous permettra de devenir un développeur web
+                  full-stack. Vous apprendrez à créer des sites web modernes et
+                  interactifs en partant de zéro.
+                </p>
+
+                <h3 class="text-xl font-semibold mb-4">
+                  Ce que vous allez apprendre :
+                </h3>
+                <ul class="space-y-2 mb-8">
+                  <li class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-3"></i>HTML5 et
+                    CSS3 avancés
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-3"></i>JavaScript
+                    moderne (ES6+)
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-3"></i>Framework
+                    React
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-3"></i>Node.js et
+                    Express
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-check text-green-500 mr-3"></i>Bases de
+                    données MongoDB
+                  </li>
+                </ul>
+
+                <button
+                  onclick="showPreview()"
+                  class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-medium"
+                >
+                  <i class="fas fa-play mr-2"></i>Regarder un aperçu gratuit
+                </button>
+              </div>
+            </div>
+
+            <div class="lg:col-span-1">
+              <!-- Course Info Card -->
+              <div class="bg-white rounded-2xl card-shadow p-6 sticky top-24">
+                <div class="text-center mb-6">
+                  <div class="text-3xl font-bold text-blue-600 mb-2">
+                    89 TND
+                  </div>
+                  <div class="text-gray-500 line-through">120 TND</div>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                  <div class="flex items-center">
+                    <i class="fas fa-clock text-gray-400 mr-3"></i>
+                    <span>12 heures de contenu</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-certificate text-gray-400 mr-3"></i>
+                    <span>Certificat inclus</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-infinity text-gray-400 mr-3"></i>
+                    <span>Accès à vie</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-user text-gray-400 mr-3"></i>
+                    <span>Jean Dupont</span>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <button
+                    onclick="showPage('payment')"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium"
+                  >
+                    Acheter ce cours
+                  </button>
+                  <button
+                    onclick="showPage('subscription')"
+                    class="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-50 py-3 px-4 rounded-lg font-medium"
+                  >
+                    S'abonner à EduNet
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Page -->
+      <div
+        id="payment-page"
+        class="page-content hidden min-h-screen flex items-center justify-center py-12 px-4"
+      >
+        <div class="max-w-2xl w-full">
+          <div class="bg-white rounded-2xl card-shadow p-8">
+            <div class="text-center mb-8">
+              <h2 class="text-3xl font-bold font-poppins text-gray-900 mb-2">
+                Paiement sécurisé du cours
+              </h2>
+              <p class="text-gray-600">Powered by Paymee Sandbox</p>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="bg-gray-50 rounded-lg p-6 mb-8">
+              <h3 class="font-semibold mb-4">Résumé de la commande</h3>
+              <div class="flex justify-between items-center mb-2">
+                <span>Développement Web Complet</span>
+                <span>89 TND</span>
+              </div>
+              <div class="flex justify-between items-center mb-2">
+                <span>TVA (19%)</span>
+                <span>16.91 TND</span>
+              </div>
+              <hr class="my-3" />
+              <div class="flex justify-between items-center font-bold text-lg">
+                <span>Total</span>
+                <span>105.91 TND</span>
+              </div>
+            </div>
+
+            <!-- Payment Form -->
+            <form onsubmit="handlePayment(event)">
+              <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    for="cardholder-name"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Nom du titulaire</label
+                  >
+                  <input
+                    type="text"
+                    id="cardholder-name"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    for="card-number"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Numéro de carte</label
+                  >
+                  <input
+                    type="text"
+                    id="card-number"
+                    placeholder="1234 5678 9012 3456"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label
+                    for="expiry-date"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >Date d'expiration</label
+                  >
+                  <input
+                    type="text"
+                    id="expiry-date"
+                    placeholder="MM/AA"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    for="cvv"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                    >CVV</label
+                  >
+                  <input
+                    type="text"
+                    id="cvv"
+                    placeholder="123"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium text-lg"
+              >
+                <i class="fas fa-lock mr-2"></i>Payer maintenant (Sandbox)
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription Page -->
+      <div id="subscription-page" class="page-content hidden py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold font-poppins text-gray-900 mb-4">
+              Abonnement illimité EduNet
+            </h1>
+            <p class="text-xl text-gray-600">
+              Accédez à tous nos cours pour un prix mensuel fixe
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <!-- Free Plan -->
+            <div class="bg-white rounded-2xl card-shadow p-8">
+              <h3 class="text-2xl font-bold font-poppins mb-4">
+                Accès Gratuit
+              </h3>
+              <div class="text-3xl font-bold text-gray-900 mb-6">
+                0 TND<span class="text-lg font-normal text-gray-500"
+                  >/mois</span
+                >
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li class="flex items-center">
+                  <i class="fas fa-check text-green-500 mr-3"></i>Cours gratuits
+                  uniquement
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-check text-green-500 mr-3"></i>Accès limité
+                  aux ressources
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-times text-red-500 mr-3"></i>Pas de
+                  certificats
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-times text-red-500 mr-3"></i>Support limité
+                </li>
+              </ul>
+              <button
+                class="w-full border-2 border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium"
+              >
+                Déjà actif
+              </button>
+            </div>
+
+            <!-- Premium Plan -->
+            <div
+              class="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-2xl card-shadow p-8 relative"
+            >
+              <div
+                class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-medium"
+              >
+                Populaire
+              </div>
+              <h3 class="text-2xl font-bold font-poppins mb-4">
+                Abonnement Premium
+              </h3>
+              <div class="text-3xl font-bold mb-6">
+                30 TND<span class="text-lg font-normal opacity-80">/mois</span>
+              </div>
+              <ul class="space-y-3 mb-8">
+                <li class="flex items-center">
+                  <i class="fas fa-check mr-3"></i>Accès illimité à tous les
+                  cours
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-check mr-3"></i>Téléchargement des ressources
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-check mr-3"></i>Certificats de completion
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-check mr-3"></i>Suivi des quiz et progression
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-check mr-3"></i>Support prioritaire
+                </li>
+                <li class="flex items-center">
+                  <i class="fas fa-check mr-3"></i>Nouveaux cours en
+                  avant-première
+                </li>
+              </ul>
+              <button
+                onclick="subscribeNow()"
+                class="w-full bg-white text-blue-600 py-3 px-4 rounded-lg font-medium hover:bg-gray-100"
+              >
+                S'abonner maintenant
+              </button>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <p class="text-gray-600 mb-4">
+              Annulation possible à tout moment • Facturation mensuelle •
+              Support 24/7
+            </p>
+            <div class="flex justify-center space-x-8 text-sm text-gray-500">
+              <span
+                ><i class="fas fa-shield-alt mr-2"></i>Paiement sécurisé</span
+              >
+              <span><i class="fas fa-undo mr-2"></i>Garantie 30 jours</span>
+              <span><i class="fas fa-headset mr-2"></i>Support client</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Page -->
+      <div id="dashboard-page" class="page-content hidden">
+        <div class="flex h-screen bg-gray-50">
+          <!-- Sidebar -->
+          <div class="w-64 bg-white shadow-lg">
+            <div class="p-6">
+              <h2 class="text-xl font-bold font-poppins text-gray-900">
+                Mon Espace
+              </h2>
+            </div>
+            <nav class="mt-6">
+              <a
+                href="#"
+                onclick="showDashboardSection('my-courses')"
+                class="dashboard-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-book mr-3"></i>Mes cours
+              </a>
+              <a
+                href="#"
+                onclick="showDashboardSection('progress')"
+                class="dashboard-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-chart-line mr-3"></i>Progression
+              </a>
+              <a
+                href="#"
+                onclick="showDashboardSection('quiz-results')"
+                class="dashboard-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-trophy mr-3"></i>Résultats quiz
+              </a>
+              <a
+                href="#"
+                onclick="showDashboardSection('subscription-status')"
+                class="dashboard-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-credit-card mr-3"></i>Abonnement
+              </a>
+            </nav>
+          </div>
+
+          <!-- Main Content -->
+          <div class="flex-1 overflow-auto">
+            <div class="p-8">
+              <!-- Welcome Section -->
+              <div class="mb-8">
+                <h1 class="text-3xl font-bold font-poppins text-gray-900 mb-2">
+                  Bonjour, Jean Dupont !
+                </h1>
+                <p class="text-gray-600">
+                  Continuez votre apprentissage là où vous vous êtes arrêté
+                </p>
+              </div>
+
+              <!-- Dashboard Sections -->
+              <div id="my-courses-section" class="dashboard-section">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center justify-between mb-4">
+                      <h3 class="font-semibold">Développement Web</h3>
+                      <span class="text-blue-600 text-sm">75%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                      <div
+                        class="bg-blue-600 h-2 rounded-full"
+                        style="width: 75%"
+                      ></div>
+                    </div>
+                    <button
+                      onclick="showPage('quiz')"
+                      class="text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Continuer le cours
+                    </button>
+                  </div>
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center justify-between mb-4">
+                      <h3 class="font-semibold">Design UI/UX</h3>
+                      <span class="text-blue-600 text-sm">45%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                      <div
+                        class="bg-blue-600 h-2 rounded-full"
+                        style="width: 45%"
+                      ></div>
+                    </div>
+                    <button
+                      class="text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Continuer le cours
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stats Cards -->
+              <div class="grid md:grid-cols-4 gap-6">
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                  <div class="text-3xl font-bold text-blue-600 mb-2">3</div>
+                  <div class="text-gray-600">Cours en cours</div>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                  <div class="text-3xl font-bold text-green-600 mb-2">1</div>
+                  <div class="text-gray-600">Cours terminés</div>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                  <div class="text-3xl font-bold text-purple-600 mb-2">24h</div>
+                  <div class="text-gray-600">Temps d'étude</div>
+                </div>
+                <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                  <div class="text-3xl font-bold text-orange-600 mb-2">85%</div>
+                  <div class="text-gray-600">Score moyen</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz Page -->
+      <div id="quiz-page" class="page-content hidden py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="bg-white rounded-2xl card-shadow p-8">
+            <div class="mb-8">
+              <h1 class="text-3xl font-bold font-poppins text-gray-900 mb-2">
+                Quiz du module
+              </h1>
+              <p class="text-gray-600">
+                Testez vos connaissances sur le développement web
+              </p>
+              <div class="mt-4">
+                <div class="flex justify-between text-sm text-gray-500 mb-2">
+                  <span>Question 1 sur 3</span>
+                  <span>Temps restant: 5:00</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    class="bg-blue-600 h-2 rounded-full"
+                    style="width: 33%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+            <form onsubmit="submitQuiz(event)" id="quiz-form">
+              <div class="space-y-8">
+                <div class="quiz-question">
+                  <h3 class="text-xl font-semibold mb-4">
+                    1. Quel est le langage de balisage utilisé pour structurer
+                    le contenu web ?
+                  </h3>
+                  <div class="space-y-3">
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input type="radio" name="q1" value="css" class="mr-3" />
+                      <span>CSS</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input type="radio" name="q1" value="html" class="mr-3" />
+                      <span>HTML</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q1"
+                        value="javascript"
+                        class="mr-3"
+                      />
+                      <span>JavaScript</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q1"
+                        value="python"
+                        class="mr-3"
+                      />
+                      <span>Python</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="quiz-question">
+                  <h3 class="text-xl font-semibold mb-4">
+                    2. Quelle propriété CSS est utilisée pour changer la couleur
+                    du texte ?
+                  </h3>
+                  <div class="space-y-3">
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q2"
+                        value="background-color"
+                        class="mr-3"
+                      />
+                      <span>background-color</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q2"
+                        value="color"
+                        class="mr-3"
+                      />
+                      <span>color</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q2"
+                        value="font-color"
+                        class="mr-3"
+                      />
+                      <span>font-color</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q2"
+                        value="text-color"
+                        class="mr-3"
+                      />
+                      <span>text-color</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="quiz-question">
+                  <h3 class="text-xl font-semibold mb-4">
+                    3. Quel framework JavaScript est populaire pour créer des
+                    interfaces utilisateur ?
+                  </h3>
+                  <div class="space-y-3">
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q3"
+                        value="django"
+                        class="mr-3"
+                      />
+                      <span>Django</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q3"
+                        value="react"
+                        class="mr-3"
+                      />
+                      <span>React</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q3"
+                        value="laravel"
+                        class="mr-3"
+                      />
+                      <span>Laravel</span>
+                    </label>
+                    <label
+                      class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="q3"
+                        value="spring"
+                        class="mr-3"
+                      />
+                      <span>Spring</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-8 text-center">
+                <button
+                  type="submit"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium"
+                >
+                  Soumettre mes réponses
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Dashboard -->
+      <div id="admin-dashboard-page" class="page-content hidden">
+        <div class="flex h-screen bg-gray-50">
+          <!-- Admin Sidebar -->
+          <div class="w-64 bg-white shadow-lg">
+            <div class="p-6">
+              <h2 class="text-xl font-bold font-poppins text-gray-900">
+                Admin Panel
+              </h2>
+            </div>
+            <nav class="mt-6">
+              <a
+                href="#"
+                onclick="showAdminSection('overview')"
+                class="admin-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 sidebar-active"
+              >
+                <i class="fas fa-chart-bar mr-3"></i>Vue d'ensemble
+              </a>
+              <a
+                href="#"
+                onclick="showAdminSection('courses')"
+                class="admin-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-book mr-3"></i>Gestion des cours
+              </a>
+              <a
+                href="#"
+                onclick="showAdminSection('users')"
+                class="admin-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-users mr-3"></i>Gestion des utilisateurs
+              </a>
+              <a
+                href="#"
+                onclick="showAdminSection('payments')"
+                class="admin-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-credit-card mr-3"></i>Gestion des paiements
+              </a>
+              <a
+                href="#"
+                onclick="showAdminSection('promotions')"
+                class="admin-nav-item flex items-center px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <i class="fas fa-tags mr-3"></i>Promotions
+              </a>
+            </nav>
+          </div>
+
+          <!-- Admin Main Content -->
+          <div class="flex-1 overflow-auto">
+            <div class="p-8">
+              <!-- Admin Overview -->
+              <div id="admin-overview-section" class="admin-section">
+                <h1 class="text-3xl font-bold font-poppins text-gray-900 mb-8">
+                  Dashboard Administrateur
+                </h1>
+
+                <!-- Stats Cards -->
+                <div class="grid md:grid-cols-4 gap-6 mb-8">
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center">
+                      <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">
+                          1,234
+                        </div>
+                        <div class="text-gray-600">Utilisateurs totaux</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center">
+                      <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-book text-green-600 text-xl"></i>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">45</div>
+                        <div class="text-gray-600">Cours disponibles</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center">
+                      <div class="bg-purple-100 p-3 rounded-full">
+                        <i
+                          class="fas fa-dollar-sign text-purple-600 text-xl"
+                        ></i>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">
+                          12,450
+                        </div>
+                        <div class="text-gray-600">Revenus (TND)</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <div class="flex items-center">
+                      <div class="bg-orange-100 p-3 rounded-full">
+                        <i class="fas fa-crown text-orange-600 text-xl"></i>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-2xl font-bold text-gray-900">567</div>
+                        <div class="text-gray-600">Abonnements actifs</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid md:grid-cols-2 gap-8">
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                      Ventes mensuelles
+                    </h3>
+                    <div
+                      class="h-64 bg-gray-100 rounded-lg flex items-center justify-center"
+                    >
+                      <span class="text-gray-500">Graphique des ventes</span>
+                    </div>
+                  </div>
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                      Activité des utilisateurs
+                    </h3>
+                    <div
+                      class="h-64 bg-gray-100 rounded-lg flex items-center justify-center"
+                    >
+                      <span class="text-gray-500">Graphique d'activité</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Management -->
+              <div id="admin-courses-section" class="admin-section hidden">
+                <div class="flex justify-between items-center mb-8">
+                  <h1 class="text-3xl font-bold font-poppins text-gray-900">
+                    Gestion des cours
+                  </h1>
+                  <button
+                    onclick="showAddCourseModal()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+                  >
+                    <i class="fas fa-plus mr-2"></i>Nouveau cours
+                  </button>
+                </div>
+
+                <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                  <table class="w-full">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          ID
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Titre
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Prix
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Catégorie
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Statut
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr>
+                        <td class="px-6 py-4 text-sm text-gray-900">001</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Développement Web Complet
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">89 TND</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Développement
+                        </td>
+                        <td class="px-6 py-4">
+                          <span
+                            class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                            >Actif</span
+                          >
+                        </td>
+                        <td class="px-6 py-4 text-sm space-x-2">
+                          <button class="text-blue-600 hover:text-blue-700">
+                            Modifier
+                          </button>
+                          <button class="text-red-600 hover:text-red-700">
+                            Supprimer
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-6 py-4 text-sm text-gray-900">002</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Design UI/UX
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">75 TND</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">Design</td>
+                        <td class="px-6 py-4">
+                          <span
+                            class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                            >Actif</span
+                          >
+                        </td>
+                        <td class="px-6 py-4 text-sm space-x-2">
+                          <button class="text-blue-600 hover:text-blue-700">
+                            Modifier
+                          </button>
+                          <button class="text-red-600 hover:text-red-700">
+                            Supprimer
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- User Management -->
+              <div id="admin-users-section" class="admin-section hidden">
+                <h1 class="text-3xl font-bold font-poppins text-gray-900 mb-8">
+                  Gestion des utilisateurs
+                </h1>
+
+                <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                  <div class="p-6 border-b">
+                    <div class="flex space-x-4">
+                      <select
+                        class="px-3 py-2 border border-gray-300 rounded-lg"
+                      >
+                        <option>Tous les utilisateurs</option>
+                        <option>Actifs</option>
+                        <option>Suspendus</option>
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="Rechercher un utilisateur..."
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                  <table class="w-full">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Nom
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Email
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Abonnement
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Date d'inscription
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Jean Dupont
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          jean.dupont@email.com
+                        </td>
+                        <td class="px-6 py-4">
+                          <span
+                            class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                            >Premium</span
+                          >
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          15/01/2024
+                        </td>
+                        <td class="px-6 py-4 text-sm space-x-2">
+                          <button class="text-blue-600 hover:text-blue-700">
+                            Voir
+                          </button>
+                          <button class="text-orange-600 hover:text-orange-700">
+                            Suspendre
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Payment Management -->
+              <div id="admin-payments-section" class="admin-section hidden">
+                <h1 class="text-3xl font-bold font-poppins text-gray-900 mb-8">
+                  Gestion des paiements
+                </h1>
+
+                <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                  <table class="w-full">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Utilisateur
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Montant
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Date
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Cours/Abonnement
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                        >
+                          Statut
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Jean Dupont
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          105.91 TND
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          20/01/2024
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Développement Web
+                        </td>
+                        <td class="px-6 py-4">
+                          <span
+                            class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                            >Réussi</span
+                          >
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Marie Martin
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">30 TND</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          19/01/2024
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                          Abonnement mensuel
+                        </td>
+                        <td class="px-6 py-4">
+                          <span
+                            class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                            >Réussi</span
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Promotions Management -->
+              <div id="admin-promotions-section" class="admin-section hidden">
+                <div class="flex justify-between items-center mb-8">
+                  <h1 class="text-3xl font-bold font-poppins text-gray-900">
+                    Gestion des promotions
+                  </h1>
+                  <button
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+                  >
+                    <i class="fas fa-plus mr-2"></i>Nouvelle promotion
+                  </button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                      Promotions actives
+                    </h3>
+                    <div class="space-y-4">
+                      <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                          <h4 class="font-medium">Réduction Nouvel An</h4>
+                          <span
+                            class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs"
+                            >Active</span
+                          >
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">
+                          25% de réduction sur tous les cours
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          Expire le 31/01/2024
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bg-white rounded-lg card-shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">
+                      Options d'abonnement
+                    </h3>
+                    <div class="space-y-4">
+                      <div class="border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium mb-2">Abonnement mensuel</h4>
+                        <p class="text-2xl font-bold text-blue-600 mb-2">
+                          30 TND/mois
+                        </p>
+                        <button
+                          class="text-blue-600 hover:text-blue-700 text-sm"
+                        >
+                          Modifier le prix
+                        </button>
+                      </div>
+                      <div class="border border-gray-200 rounded-lg p-4">
+                        <h4 class="font-medium mb-2">Abonnement annuel</h4>
+                        <p class="text-2xl font-bold text-blue-600 mb-2">
+                          300 TND/an
+                        </p>
+                        <p class="text-sm text-green-600 mb-2">
+                          Économie de 60 TND
+                        </p>
+                        <button
+                          class="text-blue-600 hover:text-blue-700 text-sm"
+                        >
+                          Modifier le prix
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-xl font-bold font-poppins mb-4">EduNet</h3>
+            <p class="text-gray-400 mb-4">
+              La plateforme d'apprentissage en ligne qui vous accompagne vers le
+              succès.
+            </p>
+            <div class="flex space-x-4">
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-facebook text-xl"></i
+              ></a>
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-twitter text-xl"></i
+              ></a>
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-linkedin text-xl"></i
+              ></a>
+              <a href="#" class="text-gray-400 hover:text-white"
+                ><i class="fab fa-instagram text-xl"></i
+              ></a>
+            </div>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Liens rapides</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><a href="#" class="hover:text-white">À propos</a></li>
+              <li><a href="#" class="hover:text-white">Contact</a></li>
+              <li><a href="#" class="hover:text-white">Blog</a></li>
+              <li><a href="#" class="hover:text-white">Carrières</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Support</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><a href="#" class="hover:text-white">Centre d'aide</a></li>
+              <li>
+                <a href="#" class="hover:text-white"
+                  >Conditions d'utilisation</a
+                >
+              </li>
+              <li>
+                <a href="#" class="hover:text-white"
+                  >Politique de confidentialité</a
+                >
+              </li>
+              <li><a href="#" class="hover:text-white">FAQ</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Contact</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><i class="fas fa-envelope mr-2"></i>contact@edunet.tn</li>
+              <li><i class="fas fa-phone mr-2"></i>+216 70 123 456</li>
+              <li><i class="fas fa-map-marker-alt mr-2"></i>Tunis, Tunisie</li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400"
+        >
+          <p>&copy; 2024 EduNet. Tous droits réservés.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- Success Modal -->
+    <div
+      id="success-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-2xl p-8 max-w-md mx-4">
+        <div class="text-center">
+          <div
+            class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i class="fas fa-check text-green-600 text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2">Succès !</h3>
+          <p class="text-gray-600 mb-6" id="success-message">
+            Opération réussie
+          </p>
+          <button
+            onclick="closeModal('success-modal')"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Result Modal -->
+    <div
+      id="quiz-result-modal"
+      class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-2xl p-8 max-w-md mx-4">
+        <div class="text-center">
+          <div
+            id="quiz-result-icon"
+            class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <i id="quiz-result-icon-class" class="text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-2" id="quiz-result-title">
+            Résultat du quiz
+          </h3>
+          <p class="text-gray-600 mb-6" id="quiz-result-message">
+            Votre score : 2/3
+          </p>
+          <div class="space-y-3">
+            <button
+              onclick="closeModal('quiz-result-modal')"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+            >
+              Continuer
+            </button>
+            <button
+              onclick="retakeQuiz()"
+              class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-lg"
+            >
+              Refaire le quiz
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global state
+      let currentUser = null;
+      let isLoggedIn = false;
+
+      // Navigation functions
+      function showPage(pageId) {
+        // Hide all pages
+        const pages = document.querySelectorAll(".page-content");
+        pages.forEach((page) => page.classList.add("hidden"));
+
+        // Show selected page
+        const targetPage = document.getElementById(pageId + "-page");
+        if (targetPage) {
+          targetPage.classList.remove("hidden");
+        }
+
+        // Special handling for certain pages
+        if (pageId === "catalog") {
+          loadCourses();
+        } else if (pageId === "register") {
+          showPage("login");
+          switchAuthTab("register");
+        } else if (pageId === "admin-dashboard") {
+          showAdminSection("overview");
+        }
+
+        // Update navigation active state
+        updateNavigation(pageId);
+      }
+
+      function updateNavigation(activePageId) {
+        const navLinks = document.querySelectorAll(".nav-link");
+        navLinks.forEach((link) => {
+          link.classList.remove("text-blue-600", "font-semibold");
+          link.classList.add("text-gray-700");
+        });
+      }
+
+      function toggleMobileMenu() {
+        const mobileMenu = document.getElementById("mobile-menu");
+        mobileMenu.classList.toggle("hidden");
+      }
+
+      // Authentication functions
+      function switchAuthTab(tab) {
+        const loginTab = document.getElementById("login-tab");
+        const registerTab = document.getElementById("register-tab");
+        const loginForm = document.getElementById("login-form");
+        const registerForm = document.getElementById("register-form");
+
+        if (tab === "login") {
+          loginTab.classList.add("border-blue-600", "text-blue-600");
+          loginTab.classList.remove("border-gray-200", "text-gray-500");
+          registerTab.classList.add("border-gray-200", "text-gray-500");
+          registerTab.classList.remove("border-blue-600", "text-blue-600");
+          loginForm.classList.remove("hidden");
+          registerForm.classList.add("hidden");
+        } else {
+          registerTab.classList.add("border-blue-600", "text-blue-600");
+          registerTab.classList.remove("border-gray-200", "text-gray-500");
+          loginTab.classList.add("border-gray-200", "text-gray-500");
+          loginTab.classList.remove("border-blue-600", "text-blue-600");
+          registerForm.classList.remove("hidden");
+          loginForm.classList.add("hidden");
+        }
+      }
+
+      function handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById("login-email").value;
+        const password = document.getElementById("login-password").value;
+
+        // Simulate login
+        if (email && password) {
+          currentUser = { email: email, name: "Jean Dupont" };
+          isLoggedIn = true;
+          showSuccessMessage("Connexion réussie ! Bienvenue sur EduNet.");
+          setTimeout(() => {
+            showPage("dashboard");
+          }, 2000);
+        }
+      }
+
+      function handleRegister(event) {
+        event.preventDefault();
+        const name = document.getElementById("register-name").value;
+        const email = document.getElementById("register-email").value;
+        const password = document.getElementById("register-password").value;
+
+        // Simulate registration
+        if (name && email && password) {
+          currentUser = { email: email, name: name };
+          isLoggedIn = true;
+          showSuccessMessage("Inscription réussie ! Bienvenue sur EduNet.");
+          setTimeout(() => {
+            showPage("dashboard");
+          }, 2000);
+        }
+      }
+
+      function loginWithGoogle() {
+        // Simulate Google login
+        currentUser = { email: "user@gmail.com", name: "Jean Dupont" };
+        isLoggedIn = true;
+        showSuccessMessage("Connexion Google réussie !");
+        setTimeout(() => {
+          showPage("dashboard");
+        }, 2000);
+      }
+
+      // Course functions
+      function loadCourses() {
+        const coursesGrid = document.getElementById("courses-grid");
+        const courses = [
+          {
+            id: 1,
+            title: "Développement Web Complet",
+            price: "89 TND",
+            category: "development",
+            image: "fas fa-code",
+            gradient: "from-blue-500 to-purple-600",
+          },
+          {
+            id: 2,
+            title: "Design UI/UX",
+            price: "75 TND",
+            category: "design",
+            image: "fas fa-palette",
+            gradient: "from-green-500 to-teal-600",
+          },
+          {
+            id: 3,
+            title: "Marketing Digital",
+            price: "Gratuit",
+            category: "marketing",
+            image: "fas fa-chart-line",
+            gradient: "from-orange-500 to-red-600",
+          },
+          {
+            id: 4,
+            title: "Python pour débutants",
+            price: "65 TND",
+            category: "development",
+            image: "fab fa-python",
+            gradient: "from-yellow-500 to-orange-600",
+          },
+          {
+            id: 5,
+            title: "Photoshop Avancé",
+            price: "80 TND",
+            category: "design",
+            image: "fas fa-image",
+            gradient: "from-purple-500 to-pink-600",
+          },
+          {
+            id: 6,
+            title: "SEO et Référencement",
+            price: "Gratuit",
+            category: "marketing",
+            image: "fas fa-search",
+            gradient: "from-indigo-500 to-blue-600",
+          },
+        ];
+
+        coursesGrid.innerHTML = courses
+          .map(
+            (course) => `
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden hover-scale cursor-pointer" onclick="showPage('course-detail')">
+                    <div class="bg-gradient-to-r ${course.gradient} h-48 flex items-center justify-center">
+                        <i class="${course.image} text-white text-4xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-semibold text-lg mb-2">${course.title}</h3>
+                        <p class="text-gray-600 mb-4">Description du cours...</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-bold">${course.price}</span>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">Voir plus</button>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function showPreview() {
+        showSuccessMessage(
+          "Aperçu du cours disponible ! Vidéo de démonstration lancée."
+        );
+      }
+
+      // Payment functions
+      function handlePayment(event) {
+        event.preventDefault();
+        const cardholderName = document.getElementById("cardholder-name").value;
+        const cardNumber = document.getElementById("card-number").value;
+        const expiryDate = document.getElementById("expiry-date").value;
+        const cvv = document.getElementById("cvv").value;
+
+        if (cardholderName && cardNumber && expiryDate && cvv) {
+          showSuccessMessage(
+            "Paiement réussi ! Accès au cours débloqué. Redirection vers votre espace personnel..."
+          );
+          setTimeout(() => {
+            showPage("dashboard");
+          }, 3000);
+        }
+      }
+
+      function subscribeNow() {
+        showSuccessMessage(
+          "Abonnement activé ! Vous avez maintenant accès à tous les cours EduNet."
+        );
+        setTimeout(() => {
+          showPage("dashboard");
+        }, 2000);
+      }
+
+      // Dashboard functions
+      function showDashboardSection(sectionId) {
+        // Update sidebar active state
+        const navItems = document.querySelectorAll(".dashboard-nav-item");
+        navItems.forEach((item) => {
+          item.classList.remove("sidebar-active");
+        });
+        event.target
+          .closest(".dashboard-nav-item")
+          .classList.add("sidebar-active");
+      }
+
+      // Quiz functions
+      function submitQuiz(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const answers = {
+          q1: formData.get("q1"),
+          q2: formData.get("q2"),
+          q3: formData.get("q3"),
+        };
+
+        // Check answers
+        const correctAnswers = { q1: "html", q2: "color", q3: "react" };
+        let score = 0;
+        Object.keys(answers).forEach((key) => {
+          if (answers[key] === correctAnswers[key]) score++;
+        });
+
+        showQuizResult(score, 3);
+      }
+
+      function showQuizResult(score, total) {
+        const modal = document.getElementById("quiz-result-modal");
+        const icon = document.getElementById("quiz-result-icon");
+        const iconClass = document.getElementById("quiz-result-icon-class");
+        const title = document.getElementById("quiz-result-title");
+        const message = document.getElementById("quiz-result-message");
+
+        const percentage = (score / total) * 100;
+
+        if (percentage >= 70) {
+          icon.className =
+            "bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4";
+          iconClass.className = "fas fa-trophy text-green-600 text-2xl";
+          title.textContent = "Félicitations !";
+          message.textContent = `Excellent ! Vous avez obtenu ${score}/${total} (${percentage}%)`;
+        } else {
+          icon.className =
+            "bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4";
+          iconClass.className = "fas fa-redo text-orange-600 text-2xl";
+          title.textContent = "Peut mieux faire";
+          message.textContent = `Vous avez obtenu ${score}/${total} (${percentage}%). Révisez et réessayez !`;
+        }
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+
+      function retakeQuiz() {
+        closeModal("quiz-result-modal");
+        // Reset form
+        document.getElementById("quiz-form").reset();
+        // Scroll to top
+        window.scrollTo(0, 0);
+      }
+
+      // Admin functions
+      function showAdminSection(sectionId) {
+        // Hide all admin sections
+        const sections = document.querySelectorAll(".admin-section");
+        sections.forEach((section) => section.classList.add("hidden"));
+
+        // Show selected section
+        const targetSection = document.getElementById(
+          "admin-" + sectionId + "-section"
+        );
+        if (targetSection) {
+          targetSection.classList.remove("hidden");
+        }
+
+        // Update sidebar active state
+        const navItems = document.querySelectorAll(".admin-nav-item");
+        navItems.forEach((item) => {
+          item.classList.remove("sidebar-active");
+        });
+        event.target.closest(".admin-nav-item").classList.add("sidebar-active");
+      }
+
+      function showAddCourseModal() {
+        showSuccessMessage(
+          "Modal d'ajout de cours ouvert (fonctionnalité de démonstration)"
+        );
+      }
+
+      // Utility functions
+      function showSuccessMessage(message) {
+        const modal = document.getElementById("success-modal");
+        const messageElement = document.getElementById("success-message");
+        messageElement.textContent = message;
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+
+      function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", function () {
+        showPage("home");
+
+        // Add admin access for demo
+        setTimeout(() => {
+          const nav = document.querySelector(".hidden.md\\:block");
+          if (nav) {
+            const adminLink = document.createElement("a");
+            adminLink.href = "#";
+            adminLink.onclick = () => showPage("admin-dashboard");
+            adminLink.className =
+              "nav-link text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium";
+            adminLink.textContent = "Admin";
+            nav.querySelector(".flex").appendChild(adminLink);
+          }
+        }, 1000);
+      });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'98ff50ab94195bd0',t:'MTc2MDY5OTA2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
