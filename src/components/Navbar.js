@@ -14,7 +14,7 @@ const Navbar = ({ role, setRole }) => {
   ];
 
   // 🔹 Liens spécifiques à l'étudiant
-  const studentLinks = [{ name: "Mes Cours", to: "/my-courses" }];
+  const studentLinks = [{ name: "mon espace", to: "/Dashboard" }];
 
   // 🔹 Déterminer quels liens afficher selon le rôle
   let roleLinks = [];

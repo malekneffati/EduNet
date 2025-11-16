@@ -4,6 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getMessaging } from "firebase/messaging";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyAVwXVdXXMaHAmEJMxe_mZCQLTWQCzvD1s",
   authDomain: "edunet-1574d.firebaseapp.com",

@@ -7,6 +7,8 @@ import Catalog from "./pages/Catalog";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import CourseDetails from "./pages/CourseDetails";
+import CourseContent from "./pages/CourseContent";
 import PrivateRoute from "./components/auth/privateRoute";
 
 function App() {
@@ -33,7 +35,7 @@ function App() {
               </PrivateRoute>
             }
           />
-         <Route
+          <Route
             path="/admin-dashboard"
             element={
               <PrivateRoute requiredRole="admin">
@@ -41,6 +43,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/course/:id/details" element={<CourseDetails />} />
+          <Route path="/course/:id/content" element={<CourseContent />} />
         </Routes>
       </main>
       <Footer />
