@@ -1,4 +1,5 @@
 // paymee-backend/index.js
+const admin = require("firebase-admin");
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -11,6 +12,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 const PAYMEE_KEY = process.env.PAYMEE_KEY; // Ta clé sandbox
 
+// ------------------- ROUTE PAYMEE -------------------
 app.post("/createPaymeePayment", async (req, res) => {
   try {
     const { amount, note, first_name, last_name, email, phone, courseId } =
@@ -47,6 +49,7 @@ app.post("/createPaymeePayment", async (req, res) => {
   }
 });
 
+// ------------------- WEBHOOK PAYMEE -------------------
 app.post("/paymeeWebhook", (req, res) => {
   const { token, check_sum, payment_status, order_id } = req.body;
   console.log("Webhook reçu:", req.body);
@@ -55,4 +58,5 @@ app.post("/paymeeWebhook", (req, res) => {
   res.send("OK");
 });
 
+// ------------------- DEMARRAGE DU SERVEUR -------------------
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -26,7 +26,7 @@ const CourseDetails = () => {
   const fetchReviews = async () => {
     try {
       const q = query(
-        collection(db, "courses", id, "reviews"),
+        collection(db, "courses", courseId, "reviews"),
         orderBy("createdAt", "desc")
       );
 
@@ -41,7 +41,7 @@ const CourseDetails = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const snap = await getDoc(doc(db, "courses", id));
+        const snap = await getDoc(doc(db, "courses", courseId));
 
         if (snap.exists()) {
           setCourse({ id: snap.id, ...snap.data() });
@@ -57,7 +57,7 @@ const CourseDetails = () => {
     };
 
     fetchCourse();
-  }, [id]);
+  }, [courseId]);
 
   useEffect(() => {
     if (course) fetchReviews();
@@ -94,16 +94,16 @@ const CourseDetails = () => {
 
     try {
       const response = await fetch(
-        "https://TON-BACKEND.onrender.com/createPaymeePayment",
+        "https://ton-backend.onrender.com/createPayment",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount: course.price,
             note: `Achat du cours ${courseId}`,
-            first_name: auth.currentUser.displayName?.split(" ")[0] || "John",
-            last_name: auth.currentUser.displayName?.split(" ")[1] || "Doe",
-            email: auth.currentUser.email,
+            first_name: user?.firstName || "",
+            last_name: user?.lastName || "",
+            email: user?.email || "",
             phone: "+21611223344",
             courseId: courseId,
           }),
