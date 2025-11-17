@@ -12,6 +12,24 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 const PAYMEE_KEY = process.env.PAYMEE_KEY; // Ta clé sandbox
 
+// ------------------- ROUTE ADMIN -------------------
+app.post("/set-admin-role", async (req, res) => {
+  try {
+    const { uid, requesterEmail } = req.body;
+
+    // Vérifie que la personne qui fait la requête est admin
+    if (requesterEmail !== "admin@example.com") {
+      return res.status(403).json({ error: "Accès interdit." });
+    }
+
+    await admin.auth().setCustomUserClaims(uid, { role: "admin" });
+    res.json({ message: `Rôle admin attribué à ${uid}` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur lors de l’attribution du rôle." });
+  }
+});
+
 // ------------------- ROUTE PAYMEE -------------------
 app.post("/createPaymeePayment", async (req, res) => {
   try {
