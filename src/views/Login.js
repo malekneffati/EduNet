@@ -2,26 +2,26 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LoginForm from "../components/auth/LoginForm";
 import RegisterForm from "../components/auth/RegisterForm";
-import { handleGoogleAuth } from "../utils/firebaseAuth";
+import useLoginViewModel from "../viewmodels/auth/LoginViewModel";
 
 const Login = ({ updateRole }) => {
   const [isLoginTab, setIsLoginTab] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const vm = useLoginViewModel();
 
   useEffect(() => {
     if (location.state?.showRegister) setIsLoginTab(false);
   }, [location.state]);
 
   const handleGoogleLogin = async () => {
-    try {
-      const { user, role } = await handleGoogleAuth();
-      localStorage.setItem("role", role);
-      updateRole(role);
-      navigate(role === "admin" ? "/admin-dashboard" : "/dashboard");
-    } catch (err) {
-      console.error("Erreur Google Auth:", err);
-      alert("Échec de la connexion Google. Veuillez réessayer.");
+    const result = await vm.loginWithGoogle();
+    if (result) {
+      localStorage.setItem("role", result.role);
+      updateRole(result.role);
+      navigate(result.role === "admin" ? "/admin-dashboard" : "/dashboard");
+    } else {
+      alert(vm.error);
     }
   };
 

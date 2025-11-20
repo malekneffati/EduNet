@@ -1,60 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase";
+import usePopularCoursesViewModel from "../../viewmodels/home/PopularCoursesViewModel";
 
 const PopularCourses = () => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Charger tous les cours + calculer la moyenne
-  useEffect(() => {
-    const loadPopularCourses = async () => {
-      try {
-        const snap = await getDocs(collection(db, "courses"));
-
-        const courseList = [];
-
-        for (const courseDoc of snap.docs) {
-          const courseId = courseDoc.id;
-          const courseData = courseDoc.data();
-
-          // Charger reviews du cours
-          const reviewsSnap = await getDocs(
-            collection(db, "courses", courseId, "reviews")
-          );
-
-          const reviews = reviewsSnap.docs.map((d) => d.data());
-
-          // Calcul de la moyenne
-          const avgRating =
-            reviews.length > 0
-              ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-              : 0;
-
-          courseList.push({
-            id: courseId,
-            ...courseData,
-            rating: avgRating.toFixed(1),
-          });
-        }
-
-        // Trier du plus haut au plus bas
-        courseList.sort((a, b) => b.rating - a.rating);
-
-        // Garder seulement 3 cours
-        setCourses(courseList.slice(0, 3));
-      } catch (err) {
-        console.error("Erreur loading popular courses :", err);
-        setError("Impossible de charger les cours populaires");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPopularCourses();
-  }, []);
+  const { courses, loading, error } = usePopularCoursesViewModel();
 
   return (
     <section className="py-16 bg-white">

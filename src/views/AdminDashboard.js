@@ -1,14 +1,15 @@
 // src/pages/AdminDashboard.jsx
-import React, { useState } from "react";
+import React from "react";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import StatCard from "../components/admin/StatCard";
 import UserManagement from "../components/admin/UserManagement";
 import CourseManagement from "../components/admin/CourseManagement";
 import { FaUsers, FaBook, FaDollarSign, FaCrown } from "react-icons/fa";
+import useAdminDashboardViewModel from "../viewmodels/admin/AdminDashboardViewModel";
 
 const AdminDashboard = () => {
-  const [activeSection, setActiveSection] = useState("overview");
+  const { activeSection, setActiveSection } = useAdminDashboardViewModel();
 
   const renderSection = () => {
     switch (activeSection) {
@@ -16,8 +17,6 @@ const AdminDashboard = () => {
         return (
           <>
             <AdminHeader title="Dashboard Administrateur" />
-
-            {/* Statistiques */}
             <div className="grid md:grid-cols-4 gap-6 mb-8">
               <StatCard
                 icon={<FaUsers />}
@@ -44,8 +43,6 @@ const AdminDashboard = () => {
                 color="orange"
               />
             </div>
-
-            {/* Graphiques placeholders */}
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold mb-4">
@@ -66,7 +63,6 @@ const AdminDashboard = () => {
             </div>
           </>
         );
-
       case "courses":
         return (
           <>
@@ -74,7 +70,6 @@ const AdminDashboard = () => {
             <CourseManagement />
           </>
         );
-
       case "users":
         return (
           <>
@@ -82,13 +77,10 @@ const AdminDashboard = () => {
             <UserManagement />
           </>
         );
-
       case "payments":
         return <AdminHeader title="Gestion des paiements" />;
-
       case "promotions":
         return <AdminHeader title="Promotions" />;
-
       default:
         return null;
     }
@@ -96,10 +88,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <AdminSidebar activeSection={activeSection} onSelect={setActiveSection} />
-
-      {/* Main content */}
       <div className="flex-1 overflow-auto p-8">{renderSection()}</div>
     </div>
   );

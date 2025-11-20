@@ -22,7 +22,7 @@ const HeroSection = () => {
                 Explorer les cours
               </Link>
               <Link
-                to="/subscription"
+                to="/login"
                 className="inline-block border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-900 transition"
               >
                 S'abonner

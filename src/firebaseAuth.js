@@ -28,13 +28,12 @@ export const handleRegister = async (email, password, name) => {
   await setDoc(doc(db, "users", user.uid), {
     name,
     email,
-    role: "student", 
+    role: "student",
     createdAt: new Date().toISOString(),
   });
 
   return { user, role: "student" };
 };
-
 
 export const handleLogin = async (email, password) => {
   const userCredential = await signInWithEmailAndPassword(

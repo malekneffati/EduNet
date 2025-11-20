@@ -1,76 +1,17 @@
-// src/components/admin/CourseForm.js
-import React, { useState, useEffect } from "react";
-import UploadThingVideo from "./UploadThingVideo";
-import UploadThingPDF from "./UploadThingPDF";
+import React from "react";
+import UploadVideo from "./UploadVideo";
+import UploadPDF from "./UploadPDF";
+import useCourseFormViewModel from "../../viewmodels/admin/CourseFormViewModel";
 
-const CourseForm = ({ initialData = null, onCancel, onSave }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
-  const [isFree, setIsFree] = useState(false);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [pdfUrl, setPdfUrl] = useState("");
-  const [category, setCategory] = useState("Développement");
-  const [instructor, setInstructor] = useState("");
-  const [duration, setDuration] = useState("");
-
-  useEffect(() => {
-    if (initialData) {
-      setTitle(initialData.title || "");
-      setDescription(initialData.description || "");
-      setPrice(initialData.price || 0);
-      setIsFree(initialData.isFree || false);
-      setVideoUrl(initialData.videoUrl || "");
-      setPdfUrl(initialData.pdfUrl || "");
-      setCategory(initialData.category || "Développement");
-      setInstructor(initialData.instructor || "");
-      setDuration(initialData.duration || "");
-    }
-  }, [initialData]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!title.trim()) return alert("Le titre est obligatoire.");
-    if (!isFree && price <= 0)
-      return alert("Le prix doit être supérieur à 0 pour un cours payant.");
-
-    const payload = {
-      title: title.trim(),
-      description: description.trim(),
-      price: isFree ? 0 : Number(price),
-      isFree,
-      videoUrl,
-      pdfUrl,
-      category,
-      instructor: instructor.trim(),
-      duration: duration.trim(),
-      status: "active",
-    };
-
-    try {
-      await onSave(payload);
-      alert("Cours enregistré avec succès !");
-    } catch (err) {
-      console.error(err);
-      alert("Erreur lors de l'enregistrement");
-    }
-  };
-
-  const categories = [
-    "Développement",
-    "Design",
-    "Marketing",
-    "Business",
-    "Autre",
-  ];
+const CourseForm = ({ initialData, onSave, onCancel }) => {
+  const vm = useCourseFormViewModel(initialData, onSave, onCancel);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
+      <div className="absolute inset-0 bg-black/50" onClick={vm.onCancel} />
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={vm.handleSubmit}
         className="relative z-10 bg-white p-6 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto space-y-5"
       >
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -85,8 +26,8 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
           <input
             required
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={vm.title}
+            onChange={(e) => vm.setTitle(e.target.value)}
             placeholder="Ex: Développement Web Complet"
           />
         </div>
@@ -99,8 +40,8 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
           <textarea
             rows="4"
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={vm.description}
+            onChange={(e) => vm.setDescription(e.target.value)}
             placeholder="Décrivez le contenu du cours..."
           />
         </div>
@@ -113,10 +54,10 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
             </label>
             <select
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              value={vm.category}
+              onChange={(e) => vm.setCategory(e.target.value)}
             >
-              {categories.map((cat) => (
+              {vm.categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
                 </option>
@@ -130,8 +71,8 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
             </label>
             <input
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              value={instructor}
-              onChange={(e) => setInstructor(e.target.value)}
+              value={vm.instructor}
+              onChange={(e) => vm.setInstructor(e.target.value)}
               placeholder="Ex: Jean Dupont"
             />
           </div>
@@ -144,8 +85,8 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
           </label>
           <input
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+            value={vm.duration}
+            onChange={(e) => vm.setDuration(e.target.value)}
             placeholder="Ex: 12 heures"
           />
         </div>
@@ -155,14 +96,14 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
-              checked={isFree}
-              onChange={(e) => setIsFree(e.target.checked)}
+              checked={vm.isFree}
+              onChange={(e) => vm.setIsFree(e.target.checked)}
               className="w-5 h-5 text-blue-600"
             />
             <span className="font-medium text-gray-700">Cours gratuit</span>
           </label>
 
-          {!isFree && (
+          {!vm.isFree && (
             <div className="mt-3">
               <label className="block text-sm text-gray-600 mb-1">
                 Prix (TND)
@@ -171,8 +112,8 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
                 type="number"
                 min="0"
                 step="0.01"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                value={vm.price}
+                onChange={(e) => vm.setPrice(e.target.value)}
                 className="w-full md:w-48 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="Ex: 89"
               />
@@ -185,9 +126,9 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
           <label className="block font-medium text-gray-700 mb-3">
             🎬 Vidéo du cours
           </label>
-          <UploadThingVideo
-            onUploadComplete={(url) => setVideoUrl(url)}
-            existingUrl={videoUrl}
+          <UploadVideo
+            onUploadComplete={(url) => vm.setVideoUrl(url)}
+            existingUrl={vm.videoUrl}
           />
         </div>
 
@@ -196,9 +137,9 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
           <label className="block font-medium text-gray-700 mb-3">
             📄 Document PDF
           </label>
-          <UploadThingPDF
-            onUploadComplete={(url) => setPdfUrl(url)}
-            existingUrl={pdfUrl}
+          <UploadPDF
+            onUploadComplete={(url) => vm.setPdfUrl(url)}
+            existingUrl={vm.pdfUrl}
           />
         </div>
 
@@ -206,7 +147,7 @@ const CourseForm = ({ initialData = null, onCancel, onSave }) => {
         <div className="flex justify-end gap-3 pt-4 border-t">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={vm.onCancel}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             Annuler

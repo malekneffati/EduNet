@@ -1,7 +1,7 @@
 import React from "react";
-import HeroSection from "../components/Home/HeroSection";
-import PopularCourses from "../components/Home/PopularCourses";
-import WhyChoose from "../components/Home/WhyChoose";
+import HeroSection from "../components/home/HeroSection";
+import PopularCourses from "../components/home/PopularCourses";
+import WhyChoose from "../components/home/WhyChoose";
 
 const Home = () => {
   return (

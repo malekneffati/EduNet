@@ -1,3 +1,4 @@
+// src/components/admin/AdminSidebar.jsx
 import React from "react";
 import { FaHome, FaBook, FaUsers, FaDollarSign, FaTags } from "react-icons/fa";
 

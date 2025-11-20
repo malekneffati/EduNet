@@ -1,15 +1,15 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import Catalog from "./pages/Catalog";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
-import CourseDetails from "./pages/CourseDetails";
-import CourseContent from "./pages/CourseContent";
-import PrivateRoute from "./components/auth/privateRoute";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/home/Navbar";
+import Footer from "./components/home/Footer";
+import PrivateRoute from "./components/auth/PrivateRoute";
+import Home from "./views/Home";
+import Login from "./views/Login";
+import Dashboard from "./views/Dashboard";
+import AdminDashboard from "./views/AdminDashboard";
+import Catalog from "./views/Catalog";
+import CourseDetails from "./views/CourseDetails";
+import CourseContent from "./views/CourseContent";
 
 function App() {
   const [role, setRole] = React.useState(localStorage.getItem("role") || null);
@@ -43,6 +43,7 @@ function App() {
               </PrivateRoute>
             }
           />
+
           <Route path="/course/:id/details" element={<CourseDetails />} />
           <Route path="/course/:id/content" element={<CourseContent />} />
         </Routes>

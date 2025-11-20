@@ -1,73 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { db } from "../../utils/firebaseConfig";
-import {
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import React from "react";
+import useUserManagementViewModel from "../../viewmodels/admin/UserManagementViewModel";
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
+  const vm = useUserManagementViewModel();
 
-  // 🔹 Charger les utilisateurs Firestore
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const userList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setUsers(userList);
-    } catch (error) {
-      console.error("Erreur lors du chargement des utilisateurs :", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  // 🔹 Supprimer un utilisateur
-  const handleDelete = async (id) => {
-    if (window.confirm("Supprimer cet utilisateur ?")) {
-      try {
-        await deleteDoc(doc(db, "users", id));
-        fetchUsers();
-      } catch (error) {
-        console.error("Erreur lors de la suppression :", error);
-      }
-    }
-  };
-
-  // 🔹 Modifier le rôle
-  const handleRoleChange = async (id, role) => {
-    try {
-      const userRef = doc(db, "users", id);
-      await updateDoc(userRef, { role });
-      fetchUsers();
-    } catch (error) {
-      console.error("Erreur lors du changement de rôle :", error);
-    }
-  };
-
-  // 🔹 Filtrer les utilisateurs par recherche et rôle
-  const filteredUsers = users.filter((u) => {
-    const matchSearch =
-      u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchRole = roleFilter === "all" ? true : u.role === roleFilter;
-    return matchSearch && matchRole;
-  });
-
-  if (loading) return <p className="text-center mt-10">Chargement...</p>;
+  if (vm.loading) return <p className="text-center mt-10">Chargement...</p>;
 
   return (
     <div>
@@ -76,14 +13,14 @@ const UserManagement = () => {
         <input
           type="text"
           placeholder="Rechercher un utilisateur..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={vm.searchTerm}
+          onChange={(e) => vm.setSearchTerm(e.target.value)}
           className="border p-2 rounded flex-1 min-w-[250px]"
         />
 
         <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
+          value={vm.roleFilter}
+          onChange={(e) => vm.setRoleFilter(e.target.value)}
           className="border p-2 rounded"
         >
           <option value="all">Tous les rôles</option>
@@ -106,7 +43,7 @@ const UserManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => {
+            {vm.filteredUsers.map((user) => {
               const sub = user.subscription || {};
               let abonnement = "Gratuit";
               let color = "bg-gray-100 text-gray-600";
@@ -135,7 +72,7 @@ const UserManagement = () => {
                     <select
                       value={user.role}
                       onChange={(e) =>
-                        handleRoleChange(user.id, e.target.value)
+                        vm.handleRoleChange(user.id, e.target.value)
                       }
                       className="border p-1 rounded"
                     >
@@ -156,7 +93,7 @@ const UserManagement = () => {
                   </td>
                   <td className="p-3 text-center">
                     <button
-                      onClick={() => handleDelete(user.id)}
+                      onClick={() => vm.handleDelete(user.id)}
                       className="text-red-500 hover:text-red-700 transition"
                     >
                       Supprimer
@@ -168,7 +105,7 @@ const UserManagement = () => {
           </tbody>
         </table>
 
-        {filteredUsers.length === 0 && (
+        {vm.filteredUsers.length === 0 && (
           <p className="text-center py-6 text-gray-500">
             Aucun utilisateur trouvé.
           </p>
