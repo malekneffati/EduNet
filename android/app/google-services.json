@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "382115033753",
+    "project_id": "edunet-1574d",
+    "storage_bucket": "edunet-1574d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:382115033753:android:9a0f5c0e0ccd3ed70ffe08",
+        "android_client_info": {
+          "package_name": "com.edunet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "382115033753-lmk265l8guoasti503h6cgdmtup2nq21.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsp4oaKSEFMPvaAKVVa1ZUpmsOz8hiPiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "382115033753-lmk265l8guoasti503h6cgdmtup2nq21.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "382115033753-tmnl8e0k3vkch98vdti5aqjqvg021l66.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.edunet"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:382115033753:android:bddccff6da4e06740ffe08",
+        "android_client_info": {
+          "package_name": "com.example.edunet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "382115033753-lmk265l8guoasti503h6cgdmtup2nq21.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsp4oaKSEFMPvaAKVVa1ZUpmsOz8hiPiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "382115033753-lmk265l8guoasti503h6cgdmtup2nq21.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "382115033753-tmnl8e0k3vkch98vdti5aqjqvg021l66.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.edunet"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
