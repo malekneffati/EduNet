@@ -1,22 +1,22 @@
-// lib/views/catalog_view.dart
+// lib/views/subscription_view.dart
 import 'package:flutter/material.dart';
 
-class CatalogView extends StatelessWidget {
-  const CatalogView({super.key});
+class SubscriptionView extends StatelessWidget {
+  const SubscriptionView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    print("📚 [CATALOG] Build CatalogView");
+    print("💰 [SUBSCRIPTION] Build SubscriptionView");
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Catalogue des cours'),
+        title: const Text('Abonnement'),
         backgroundColor: const Color(0xFF1E3A8A),
         foregroundColor: Colors.white,
       ),
       body: const Center(
         child: Text(
-          'Catalogue des cours',
+          'Page Abonnement - À implémenter',
           style: TextStyle(fontSize: 24),
         ),
       ),

@@ -1,48 +1,47 @@
 // lib/viewmodels/auth/auth_viewmodel.dart
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/firebase_auth_service.dart';
-import '../../models/user_model.dart';
 
-class AuthViewModel with ChangeNotifier {
-  final FirebaseAuthService _authService = FirebaseAuthService();
-
-  UserModel? _user;
+class AuthViewModel extends ChangeNotifier {
   bool _loading = true;
-  String? _error;
+  bool _isAuthenticated = false;
+  User? _user;
 
-  UserModel? get user => _user;
   bool get loading => _loading;
-  String? get error => _error;
-  bool get isAuthenticated => _user != null;
+  bool get isAuthenticated => _isAuthenticated;
+  User? get user => _user;
 
   AuthViewModel() {
-    _initAuthState();
+    print("🔐 [AuthViewModel] Initialisation...");
+    _initAuthListener();
   }
 
-  void _initAuthState() {
-    _authService.authStateChanges.listen((User? firebaseUser) async {
-      if (firebaseUser == null) {
-        _user = null;
-        _loading = false;
-        notifyListeners();
-        return;
-      }
+  void _initAuthListener() {
+    print("👂 [AuthViewModel] Démarrage écouteur auth...");
 
-      try {
-        _user = await _authService.getUserData(firebaseUser.uid);  // Changed to public getUserData
-      } catch (e) {
-        _error = e.toString();
-        _user = null;
-      } finally {
-        _loading = false;
-        notifyListeners();
-      }
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      print("🔄 [AuthViewModel] Changement d'état auth: ${user?.email}");
+
+      _user = user;
+      _isAuthenticated = user != null;
+      _loading = false;
+
+      print("📊 [AuthViewModel] Nouvel état - loading: $_loading, isAuth: $_isAuthenticated, user: ${_user?.email}");
+
+      notifyListeners();
+    }, onError: (error) {
+      print("❌ [AuthViewModel] Erreur écouteur auth: $error");
+      _loading = false;
+      notifyListeners();
     });
   }
 
-  void clearError() {
-    _error = null;
+  // Forcer le refresh si nécessaire
+  void checkAuthStatus() {
+    print("🔍 [AuthViewModel] Vérification manuelle du statut auth");
+    _user = FirebaseAuth.instance.currentUser;
+    _isAuthenticated = _user != null;
+    _loading = false;
     notifyListeners();
   }
 }

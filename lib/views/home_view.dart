@@ -1,7 +1,9 @@
-// lib/views/home_view.dart
-// Création d'un HomeView dummy pour tester la navigation post-auth.
-// Vous pouvez le remplacer plus tard par le vrai Home.js converti.
 import 'package:flutter/material.dart';
+import 'package:edunet/components/home/navbar.dart';
+import 'package:edunet/components/home/hero_section.dart';
+import 'package:edunet/components/home/popular_courses.dart';
+import 'package:edunet/components/home/why_choose.dart';
+import 'package:edunet/components/home/footer.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -9,9 +11,16 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('EduNet - Accueil')),
-      body: const Center(
-        child: Text('Bienvenue sur EduNet ! Authentification réussie.'),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Navbar(),
+            const HeroSection(),
+            const PopularCourses(),
+            const WhyChoose(),
+            const Footer(),
+          ],
+        ),
       ),
     );
   }
