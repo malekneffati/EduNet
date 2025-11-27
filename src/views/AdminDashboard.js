@@ -5,8 +5,10 @@ import AdminHeader from "../components/admin/AdminHeader";
 import StatCard from "../components/admin/StatCard";
 import UserManagement from "../components/admin/UserManagement";
 import CourseManagement from "../components/admin/CourseManagement";
+import PaymentList from "../components/admin/PaymentList";
 import { FaUsers, FaBook, FaDollarSign, FaCrown } from "react-icons/fa";
 import useAdminDashboardViewModel from "../viewmodels/admin/AdminDashboardViewModel";
+import AdminSubscriptions from "../components/admin/Subscription";
 
 const AdminDashboard = () => {
   const { activeSection, setActiveSection } = useAdminDashboardViewModel();
@@ -78,9 +80,20 @@ const AdminDashboard = () => {
           </>
         );
       case "payments":
-        return <AdminHeader title="Gestion des paiements" />;
+        return (
+          <>
+            <AdminHeader title="Gestion des paiements" />
+            <PaymentList />
+          </>
+        );
       case "promotions":
-        return <AdminHeader title="Promotions" />;
+        return (
+          <>
+            <AdminHeader title="Gestion des paiements" />
+            <AdminSubscriptions />
+          </>
+        );
+
       default:
         return null;
     }

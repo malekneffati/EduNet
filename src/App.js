@@ -10,6 +10,10 @@ import AdminDashboard from "./views/AdminDashboard";
 import Catalog from "./views/Catalog";
 import CourseDetails from "./views/CourseDetails";
 import CourseContent from "./views/CourseContent";
+import PaymentSuccess from "./views/PaymentSuccess";
+import PaymentCancel from "./views/PaymentCancel";
+import ProtectedCourse from "./views/ProtectedCourse";
+import SubscriptionsPage from "./views/SubscriptionsPage";
 
 function App() {
   const [role, setRole] = React.useState(localStorage.getItem("role") || null);
@@ -45,7 +49,19 @@ function App() {
           />
 
           <Route path="/course/:id/details" element={<CourseDetails />} />
-          <Route path="/course/:id/content" element={<CourseContent />} />
+          <Route
+            path="/course/:id/content"
+            element={
+              <ProtectedCourse>
+                <CourseContent />
+              </ProtectedCourse>
+            }
+          />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/course/payment-cancel" element={<PaymentCancel />} />
+
+          <Route path="/Subscription" element={<SubscriptionsPage />} />
+
         </Routes>
       </main>
       <Footer />

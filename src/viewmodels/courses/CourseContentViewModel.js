@@ -1,131 +1,187 @@
-// src/viewmodels/courses/CourseContentViewModel.js
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
   doc,
   getDoc,
+  collection,
+  getDocs,
   addDoc,
   Timestamp,
+  query,
+  where,
 } from "firebase/firestore";
-import { auth, db } from "../../firebase";
+import { db, auth } from "../../firebase";
 
-export default function useCourseContentViewModel(courseId) {
-  const navigate = useNavigate();
+const useCourseContentViewModel = (courseId) => {
   const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [chapters, setChapters] = useState([]);
   const [allowed, setAllowed] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  // Avis
+  // Reviews
   const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
+
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [sendingReview, setSendingReview] = useState(false);
 
-  // Vérifier si l’utilisateur a accès
-  const checkAccess = async () => {
-    if (!auth.currentUser) return false;
-    const snap = await getDoc(
-      doc(db, "users", auth.currentUser.uid, "myCourses", courseId)
-    );
-    return snap.exists();
-  };
+  const user = auth.currentUser;
 
-  // Charger cours et vérifier accès
-  useEffect(() => {
-    const loadCourse = async () => {
-      try {
-        const snap = await getDoc(doc(db, "courses", courseId));
-        if (!snap.exists()) {
-          setCourse("not_found");
-          return;
-        }
-        setCourse({ id: snap.id, ...snap.data() });
-
-        const canView = await checkAccess();
-        setAllowed(canView);
-
-        if (canView) fetchReviews();
-      } catch (err) {
-        console.error("Erreur cours :", err);
-        setCourse("error");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadCourse();
-  }, [courseId]);
-
-  // Charger les reviews
-  const fetchReviews = async () => {
+  // ------------------------------
+  // 1️⃣ FETCH COURSE DATA
+  // ------------------------------
+  const loadCourse = async () => {
     try {
-      const q = query(
-        collection(db, "courses", courseId, "reviews"),
-        orderBy("createdAt", "desc")
-      );
-      const snap = await getDocs(q);
-      setReviews(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const ref = doc(db, "courses", courseId);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) {
+        setCourse("not_found");
+        return;
+      }
+
+      const data = { id: snap.id, ...snap.data() };
+      setCourse(data);
+
+      // Directly load chapters from the array field
+      if (data.chapters && Array.isArray(data.chapters)) {
+        const sortedChapters = data.chapters
+          .map((c) => ({ ...c }))
+          .sort((a, b) => (a.order || 0) - (b.order || 0));
+        setChapters(sortedChapters);
+      } else {
+        setChapters([]);
+      }
     } catch (err) {
-      console.error("Erreur reviews :", err);
+      console.error("Erreur loadCourse:", err);
+      setCourse("error");
     }
   };
 
-  // Charger progress
-  const fetchProgress = async () => {
-    if (!auth.currentUser) return;
-    const snap = await getDoc(
-      doc(db, "users", auth.currentUser.uid, "myCourses", courseId)
+  // ------------------------------
+  // 2️⃣ CHECK ACCESS (FREE OR PURCHASED)
+  // ------------------------------
+  const checkAccess = async () => {
+    if (!user) {
+      setAllowed(false);
+      return;
+    }
+
+    if (course?.isFree) {
+      setAllowed(true);
+      return;
+    }
+
+    const q = query(
+      collection(db, "purchases"),
+      where("courseId", "==", courseId),
+      where("userId", "==", user.uid),
+      where("status", "==", "success")
     );
-    if (snap.exists()) setProgress(snap.data().progress || 0);
+
+    const snap = await getDocs(q);
+    setAllowed(!snap.empty);
   };
 
-  // Poster un avis
+  // ------------------------------
+  // 3️⃣ FETCH REVIEWS
+  // ------------------------------
+  const loadReviews = async () => {
+    try {
+      const ref = collection(db, "courses", courseId, "reviews");
+      const snap = await getDocs(ref);
+
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setReviews(data);
+
+      if (data.length > 0) {
+        const avg =
+          data.reduce((sum, r) => sum + (r.rating || 0), 0) / data.length;
+        setAverageRating(avg.toFixed(1));
+      } else {
+        setAverageRating(0);
+      }
+    } catch (err) {
+      console.error("Erreur loadReviews:", err);
+      setReviews([]);
+      setAverageRating(0);
+    }
+  };
+
+  // ------------------------------
+  // 4️⃣ SUBMIT REVIEW
+  // ------------------------------
   const submitReview = async () => {
-    if (!auth.currentUser) return alert("Veuillez vous connecter pour noter.");
-    if (!newRating) return alert("Sélectionnez une note.");
-    if (!newComment.trim()) return alert("Écrivez un commentaire.");
+    if (!user) {
+      alert("Vous devez être connecté pour laisser un avis.");
+      return;
+    }
+    if (newRating === 0) {
+      alert("Veuillez sélectionner une note.");
+      return;
+    }
 
     setSendingReview(true);
+
     try {
       await addDoc(collection(db, "courses", courseId, "reviews"), {
+        userId: user.uid,
         rating: newRating,
-        comment: newComment.trim(),
-        userId: auth.currentUser.uid,
+        comment: newComment,
         createdAt: Timestamp.now(),
       });
+
       setNewRating(0);
       setNewComment("");
-      fetchReviews();
+      await loadReviews();
     } catch (err) {
-      console.error("Erreur avis :", err);
+      console.error("Erreur submitReview:", err);
+      alert("Erreur lors de l'envoi de votre avis.");
     } finally {
       setSendingReview(false);
     }
   };
 
-  // Calcul moyenne
-  const averageRating =
-    reviews.length > 0
-      ? (reviews.reduce((a, b) => a + b.rating, 0) / reviews.length).toFixed(1)
-      : 0;
+  // ------------------------------
+  // INITIAL LOAD
+  // ------------------------------
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      await loadCourse();
+    };
+    fetchData();
+  }, [courseId]);
+
+  // Load reviews and access after course loads
+  useEffect(() => {
+    if (!course || course === "not_found") {
+      setLoading(false);
+      return;
+    }
+
+    const fetchRelatedData = async () => {
+      await Promise.all([loadReviews(), checkAccess()]);
+      setLoading(false);
+    };
+
+    fetchRelatedData();
+  }, [course]);
 
   return {
     course,
-    loading,
+    chapters,
     allowed,
-    progress,
+    loading,
     reviews,
+    averageRating,
     newRating,
     setNewRating,
     newComment,
     setNewComment,
     sendingReview,
     submitReview,
-    averageRating,
-    fetchProgress,
   };
-}
+};
+
+export default useCourseContentViewModel;

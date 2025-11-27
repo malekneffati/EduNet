@@ -1,4 +1,6 @@
+// src/viewmodels/admin/CourseFormViewModel.js
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const useCourseFormViewModel = (initialData, onSave, onCancel) => {
   const [title, setTitle] = useState("");
@@ -11,6 +13,8 @@ const useCourseFormViewModel = (initialData, onSave, onCancel) => {
   const [instructor, setInstructor] = useState("");
   const [duration, setDuration] = useState("");
 
+  const [chapters, setChapters] = useState([]);
+
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || "");
@@ -22,8 +26,34 @@ const useCourseFormViewModel = (initialData, onSave, onCancel) => {
       setCategory(initialData.category || "Développement");
       setInstructor(initialData.instructor || "");
       setDuration(initialData.duration || "");
+      setChapters(initialData.chapters || []);
     }
   }, [initialData]);
+
+  // Ajouter un chapitre
+  const addChapter = () => {
+    setChapters([
+      ...chapters,
+      {
+        id: uuidv4(),
+        title: "",
+        videoUrl: "",
+        pdfUrl: "",
+      },
+    ]);
+  };
+
+  // Supprimer un chapitre
+  const removeChapter = (id) => {
+    setChapters(chapters.filter((c) => c.id !== id));
+  };
+
+  // Mettre à jour un champ d’un chapitre
+  const updateChapter = (id, field, value) => {
+    setChapters(
+      chapters.map((c) => (c.id === id ? { ...c, [field]: value } : c))
+    );
+  };
 
   const categories = [
     "Développement",
@@ -36,30 +66,21 @@ const useCourseFormViewModel = (initialData, onSave, onCancel) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title.trim()) return alert("Le titre est obligatoire.");
-    if (!isFree && price <= 0)
-      return alert("Le prix doit être supérieur à 0 pour un cours payant.");
-
     const payload = {
-      title: title.trim(),
-      description: description.trim(),
+      title,
+      description,
       price: isFree ? 0 : Number(price),
       isFree,
       videoUrl,
       pdfUrl,
       category,
-      instructor: instructor.trim(),
-      duration: duration.trim(),
+      instructor,
+      duration,
+      chapters,
       status: "active",
     };
 
-    try {
-      await onSave(payload);
-      alert("Cours enregistré avec succès !");
-    } catch (err) {
-      console.error(err);
-      alert("Erreur lors de l'enregistrement");
-    }
+    await onSave(payload);
   };
 
   return {
@@ -84,6 +105,11 @@ const useCourseFormViewModel = (initialData, onSave, onCancel) => {
     categories,
     handleSubmit,
     onCancel,
+
+    chapters,
+    addChapter,
+    updateChapter,
+    removeChapter,
   };
 };
 

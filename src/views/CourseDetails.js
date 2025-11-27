@@ -2,15 +2,34 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import useCourseDetailsViewModel from "../viewmodels/courses/CourseDetailsViewModel";
+import PaymentViewModel from "../viewmodels/courses/PaymentViewModel";
 
 const CourseDetails = () => {
   const { id } = useParams();
-  const { course, loading, reviews, averageRating, joinCourse, handlePayment } =
-    useCourseDetailsViewModel(id);
+  const {
+    course,
+    loading,
+    reviews,
+    averageRating,
+    joinCourse,
+    handlePayment,
+    canAccessCourse,
+  } = useCourseDetailsViewModel(id);
 
   if (loading) return <p className="p-8 text-center">Chargement...</p>;
   if (course === "not_found") return <p>Cours introuvable.</p>;
   if (course === "error") return <p>Erreur de chargement.</p>;
+
+  const handlePay = async () => {
+    const paymentData = await PaymentViewModel.startPayment(course, userId);
+
+    if (paymentData?.payment_url) {
+      // Rediriger l'utilisateur vers Paymee
+      window.location.href = paymentData.payment_url;
+    } else {
+      alert("Erreur paiement : " + PaymentViewModel.error);
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4">
@@ -35,9 +54,16 @@ const CourseDetails = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
-          <div className="bg-gray-200 h-64 flex justify-center items-center rounded-lg">
-            <span className="text-gray-600">Aperçu du cours</span>
-          </div>
+          <h2 className="text-xl font-semibold mb-3">
+            Apercu gratuit du cour{" "}
+          </h2>
+          {course.videoUrl && (
+            <video
+              src={course.videoUrl}
+              controls
+              className="rounded-lg shadow-lg mb-6 w-full"
+            />
+          )}
 
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-semibold mb-3">Description</h2>
@@ -91,6 +117,13 @@ const CourseDetails = () => {
                 className="w-full py-2 bg-green-600 text-white rounded-lg"
               >
                 Commencer gratuitement
+              </button>
+            ) : canAccessCourse ? (
+              <button
+                onClick={joinCourse}
+                className="w-full py-2 bg-green-600 text-white rounded-lg"
+              >
+                Accéder au cours
               </button>
             ) : (
               <button

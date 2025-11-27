@@ -1,7 +1,7 @@
 import React from "react";
 import useUpload from "../../viewmodels/admin/useUpload";
 
-const UploadPDF = ({ onUploadComplete, existingUrl = null }) => {
+const UploadPDF = ({ existingUrl = null, onUploadComplete }) => {
   const { uploading, progress, error, uploadFile } = useUpload({
     resourceType: "raw",
     maxSize: 50 * 1024 * 1024, // 50 MB
@@ -12,7 +12,13 @@ const UploadPDF = ({ onUploadComplete, existingUrl = null }) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) uploadFile(file, onUploadComplete);
+    if (file) {
+      uploadFile(file, (url) => {
+        // fl_attachment:false pour ouvrir inline dans le navigateur
+        const inlineUrl = url.replace("/upload/", "/upload/fl_attachment:false/");
+        onUploadComplete(inlineUrl); // Update le parent (CourseForm)
+      });
+    }
   };
 
   return (
@@ -39,7 +45,9 @@ const UploadPDF = ({ onUploadComplete, existingUrl = null }) => {
           className="hidden"
         />
       </label>
+
       {error && <p className="text-red-600">{error}</p>}
+
       {existingUrl && !uploading && (
         <a
           href={existingUrl}
@@ -47,7 +55,7 @@ const UploadPDF = ({ onUploadComplete, existingUrl = null }) => {
           rel="noopener noreferrer"
           className="text-blue-600 underline"
         >
-          Voir le PDF
+          📄 Voir le PDF
         </a>
       )}
     </div>

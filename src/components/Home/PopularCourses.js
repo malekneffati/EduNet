@@ -26,7 +26,7 @@ const PopularCourses = () => {
             {courses.map((course) => (
               <Link
                 key={course.id}
-                to={`/course/${course.id}`}
+                to={`/course/${course.id}/details`}
                 className="card-shadow rounded-2xl overflow-hidden hover:scale-105 transition-transform duration-300 cursor-pointer"
               >
                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-48 flex items-center justify-center">

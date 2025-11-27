@@ -1,3 +1,4 @@
+// src/components/admin/CourseForm.js
 import React from "react";
 import UploadVideo from "./UploadVideo";
 import UploadPDF from "./UploadPDF";
@@ -25,7 +26,7 @@ const CourseForm = ({ initialData, onSave, onCancel }) => {
           </label>
           <input
             required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
             value={vm.title}
             onChange={(e) => vm.setTitle(e.target.value)}
             placeholder="Ex: Développement Web Complet"
@@ -39,21 +40,21 @@ const CourseForm = ({ initialData, onSave, onCancel }) => {
           </label>
           <textarea
             rows="4"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2"
             value={vm.description}
             onChange={(e) => vm.setDescription(e.target.value)}
             placeholder="Décrivez le contenu du cours..."
           />
         </div>
 
-        {/* Catégorie et Instructeur */}
+        {/* Catégorie + Instructeur */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block font-medium text-sm text-gray-700 mb-2">
               Catégorie
             </label>
             <select
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full border rounded-lg px-4 py-2"
               value={vm.category}
               onChange={(e) => vm.setCategory(e.target.value)}
             >
@@ -70,7 +71,7 @@ const CourseForm = ({ initialData, onSave, onCancel }) => {
               Instructeur
             </label>
             <input
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="w-full border rounded-lg px-4 py-2"
               value={vm.instructor}
               onChange={(e) => vm.setInstructor(e.target.value)}
               placeholder="Ex: Jean Dupont"
@@ -84,7 +85,7 @@ const CourseForm = ({ initialData, onSave, onCancel }) => {
             Durée
           </label>
           <input
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full border rounded-lg px-4 py-2"
             value={vm.duration}
             onChange={(e) => vm.setDuration(e.target.value)}
             placeholder="Ex: 12 heures"
@@ -98,64 +99,120 @@ const CourseForm = ({ initialData, onSave, onCancel }) => {
               type="checkbox"
               checked={vm.isFree}
               onChange={(e) => vm.setIsFree(e.target.checked)}
-              className="w-5 h-5 text-blue-600"
+              className="w-5 h-5"
             />
-            <span className="font-medium text-gray-700">Cours gratuit</span>
+            <span className="font-medium">Cours gratuit</span>
           </label>
 
           {!vm.isFree && (
             <div className="mt-3">
-              <label className="block text-sm text-gray-600 mb-1">
-                Prix (TND)
-              </label>
+              <label className="block text-sm mb-1">Prix (TND)</label>
               <input
                 type="number"
                 min="0"
                 step="0.01"
                 value={vm.price}
                 onChange={(e) => vm.setPrice(e.target.value)}
-                className="w-full md:w-48 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full md:w-48 border rounded-lg px-4 py-2"
                 placeholder="Ex: 89"
               />
             </div>
           )}
         </div>
 
-        {/* Upload Vidéo */}
+        {/* Vidéo Aperçu */}
         <div className="bg-blue-50 p-4 rounded-lg">
-          <label className="block font-medium text-gray-700 mb-3">
-            🎬 Vidéo du cours
-          </label>
+          <label className="block font-medium mb-3">🎬 Aperçu gratuit</label>
           <UploadVideo
             onUploadComplete={(url) => vm.setVideoUrl(url)}
             existingUrl={vm.videoUrl}
           />
         </div>
 
-        {/* Upload PDF */}
-        <div className="bg-green-50 p-4 rounded-lg">
-          <label className="block font-medium text-gray-700 mb-3">
-            📄 Document PDF
-          </label>
-          <UploadPDF
-            onUploadComplete={(url) => vm.setPdfUrl(url)}
-            existingUrl={vm.pdfUrl}
-          />
-        </div>
+        {/* 🔥 CHAPITRES */}
+        <h3 className="text-xl font-semibold mt-6">Chapitres du cours</h3>
+
+        {vm.chapters.map((chapter, index) => (
+          <div key={chapter.id} className="p-4 border rounded-lg bg-gray-50">
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="font-medium">Chapitre {index + 1}</h4>
+              <button
+                type="button"
+                onClick={() => vm.removeChapter(chapter.id)}
+                className="text-red-500 hover:underline"
+              >
+                Supprimer
+              </button>
+            </div>
+
+            {/* Titre chapitre */}
+            <input
+              className="w-full border rounded-lg px-3 py-2 mb-3"
+              value={chapter.title}
+              onChange={(e) =>
+                vm.updateChapter(chapter.id, "title", e.target.value)
+              }
+              placeholder="Titre du chapitre"
+            />
+
+            {/* Description chapitre */}
+            <textarea
+              className="w-full border rounded-lg px-3 py-2 mb-3"
+              rows={3}
+              value={chapter.description}
+              onChange={(e) =>
+                vm.updateChapter(chapter.id, "description", e.target.value)
+              }
+              placeholder="Description du chapitre"
+            />
+
+            {/* Vidéo */}
+            <label className="font-medium">Vidéo du chapitre</label>
+            <UploadVideo
+              onUploadComplete={(url) =>
+                vm.updateChapter(chapter.id, "videoUrl", url)
+              }
+            />
+
+            {/* PDF */}
+            <label className="font-medium mt-3 block">PDF du chapitre</label>
+            <UploadPDF
+              existingUrl={chapter.pdfUrl}
+              onUploadComplete={(url) =>
+                vm.updateChapter(chapter.id, "pdfUrl", url)
+              }
+            />
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={vm.addChapter}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 block w-fit"
+        >
+          + Ajouter un chapitre
+        </button>
+
+        <button
+          type="button"
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 block w-fit"
+        >
+          + Ajouter un quiz
+        </button>
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-4 border-t">
           <button
             type="button"
             onClick={vm.onCancel}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border rounded-lg hover:bg-gray-50"
           >
             Annuler
           </button>
 
           <button
             type="submit"
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             {initialData ? "Mettre à jour" : "Créer le cours"}
           </button>
