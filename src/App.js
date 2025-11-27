@@ -10,8 +10,6 @@ import AdminDashboard from "./views/AdminDashboard";
 import Catalog from "./views/Catalog";
 import CourseDetails from "./views/CourseDetails";
 import CourseContent from "./views/CourseContent";
-import PaymentSuccess from "./views/PaymentSuccess";
-import PaymentCancel from "./views/PaymentCancel";
 import ProtectedCourse from "./views/ProtectedCourse";
 import SubscriptionsPage from "./views/SubscriptionsPage";
 
@@ -57,9 +55,6 @@ function App() {
               </ProtectedCourse>
             }
           />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/course/payment-cancel" element={<PaymentCancel />} />
-
           <Route path="/Subscription" element={<SubscriptionsPage />} />
 
         </Routes>

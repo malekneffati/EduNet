@@ -1,6 +1,6 @@
 // src/viewmodels/PaymentViewModel.js
-import PaymentModel from "../models/PaymentModel";
-import { db } from "../firebase";
+import PaymentModel from "../../models/PaymentModel";
+import { db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 class PaymentViewModel {

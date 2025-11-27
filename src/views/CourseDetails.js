@@ -20,17 +20,6 @@ const CourseDetails = () => {
   if (course === "not_found") return <p>Cours introuvable.</p>;
   if (course === "error") return <p>Erreur de chargement.</p>;
 
-  const handlePay = async () => {
-    const paymentData = await PaymentViewModel.startPayment(course, userId);
-
-    if (paymentData?.payment_url) {
-      // Rediriger l'utilisateur vers Paymee
-      window.location.href = paymentData.payment_url;
-    } else {
-      alert("Erreur paiement : " + PaymentViewModel.error);
-    }
-  };
-
   return (
     <div className="max-w-5xl mx-auto py-12 px-4">
       <h1 className="text-3xl font-bold mb-2">{course.title}</h1>

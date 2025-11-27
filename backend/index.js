@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 app.use(cors()); // pour autoriser ton front React à appeler l'API
 
-const PAYMEE_API_KEY = "196db5766bcfa5b7fac9b262a8cd01afe0a63d24";
+const PAYMEE_API_KEY = process.env.PAYMEE_API_KEY;
 const BASE_URL = "https://sandbox.paymee.tn/api/v2";
 
 app.post("/createPayment", async (req, res) => {
