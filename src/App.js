@@ -45,7 +45,6 @@ function App() {
               </PrivateRoute>
             }
           />
-
           <Route path="/course/:id/details" element={<CourseDetails />} />
           <Route
             path="/course/:id/content"
@@ -56,7 +55,6 @@ function App() {
             }
           />
           <Route path="/Subscription" element={<SubscriptionsPage />} />
-
         </Routes>
       </main>
       <Footer />

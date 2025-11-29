@@ -119,7 +119,8 @@ export default function useCourseDetailsViewModel(courseId) {
             first_name: auth.currentUser.displayName || "User",
             last_name: "",
             email: auth.currentUser.email,
-            return_url: `${window.location.origin}/payment-success?courseId=${courseId}`,          }),
+            return_url: `${window.location.origin}/payment-success?courseId=${courseId}`,
+          }),
         }
       );
 
