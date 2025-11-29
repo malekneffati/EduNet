@@ -2,7 +2,7 @@
 class PaymentModel {
   constructor() {
     // URL de ton backend Render
-    this.FUNCTION_URL = "https://edunett.onrender.com/createPayment";
+    this.FUNCTION_URL = "https://edunet-5n83.onrender.com/createPayment";
   }
 
   /**
@@ -62,3 +62,4 @@ class PaymentModel {
 }
 
 export default new PaymentModel();
+
