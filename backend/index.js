@@ -1,8 +1,10 @@
+// EduNet/backend/index.js
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
+import "dotenv/config";
 
-const BASE_URL = "https://sandbox.paymee.tn/api/v2"; // important
+const BASE_URL = "https://sandbox.paymee.tn/api/v2";
 
 const app = express();
 app.use(cors());
@@ -18,7 +20,7 @@ app.post("/createPayment", async (req, res) => {
     phone,
     returnUrl,
     cancelUrl,
-    orderId, // optionnel mais pratique
+    orderId,
   } = req.body;
 
   try {
@@ -26,7 +28,6 @@ app.post("/createPayment", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Paymee attend "Token <clé>", pas "Bearer <clé>"
         Authorization: `Token ${process.env.PAYMEE_API_KEY}`,
       },
       body: JSON.stringify({
@@ -38,14 +39,10 @@ app.post("/createPayment", async (req, res) => {
         phone,
         return_url: returnUrl,
         cancel_url: cancelUrl,
-        webhook_url:
-          process.env.PAYMEE_WEBHOOK_URL ||
-          "https://api.render.com/deploy/srv-d4lav2ggjchc73ak44t0?key=fohpEePdf-4", 
-        order_id: orderId || "TEST-ORDER",
+        webhook_url: process.env.PAYMEE_WEBHOOK_URL,
+        order_id: orderId || "EDUNET-ORDER",
       }),
     });
-
-    console.log("PAYMEE_API_KEY length:", process.env.PAYMEE_API_KEY?.length);
 
     const data = await response.json();
 
