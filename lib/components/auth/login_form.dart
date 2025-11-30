@@ -1,7 +1,4 @@
 // lib/components/auth/login_form.dart
-// Création de LoginForm comme dans votre JS LoginForm.js, adapté à Flutter.
-// Utilise LoginViewModel pour la logique, et appelle onRoleUpdate sur succès.
-// Style conservé similaire : champs simples avec décoration, bouton élevé.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/auth/login_viewmodel.dart';
@@ -28,73 +25,135 @@ class _LoginFormState extends State<LoginForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 24),
+
+          // Email Field
           TextFormField(
             onChanged: vm.setEmail,
+            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              labelText: 'Email',
+              hintText: 'Email',
+              filled: true,
+              fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
-            validator: (value) => value!.isEmpty ? 'Email requis' : null,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Email requis';
+              }
+              if (!value.contains('@')) {
+                return 'Email invalide';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 16),
+
+          // Password Field
           TextFormField(
             onChanged: vm.setPassword,
             obscureText: true,
             decoration: InputDecoration(
-              labelText: 'Mot de passe',
+              hintText: 'Mot de passe',
+              filled: true,
+              fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
               ),
-              filled: true,
-              fillColor: Colors.grey[100],
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
             ),
-            validator: (value) => value!.isEmpty ? 'Mot de passe requis' : null,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Mot de passe requis';
+              }
+              return null;
+            },
           ),
+
+          // Error Message
+          if (vm.error != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              vm.error!,
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+
           const SizedBox(height: 24),
+
+          // Login Button
           ElevatedButton(
             onPressed: vm.loading
                 ? null
                 : () async {
               if (_formKey.currentState!.validate()) {
                 final result = await vm.login();
-                if (result != null) {
+                if (result != null && mounted) {
                   widget.onRoleUpdate(result['role'] ?? 'student');
                   if (result['role'] == 'admin') {
-                    Navigator.pushNamed(context, '/admin-dashboard');
+                    Navigator.pushReplacementNamed(context, '/admin');
                   } else {
-                    Navigator.pushNamed(context, '/dashboard');
+                    Navigator.pushReplacementNamed(context, '/home');
                   }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(vm.error ?? 'Erreur inconnue')),
-                  );
                 }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue[600],
+              backgroundColor: const Color(0xFF2563EB),
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 48),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
+              elevation: 0,
             ),
             child: vm.loading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text('Se connecter'),
-          ),
-          if (vm.error != null) ...[
-            const SizedBox(height: 16),
-            Text(
-              vm.error!,
-              style: const TextStyle(color: Colors.red),
-              textAlign: TextAlign.center,
+                ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+                : const Text(
+              'Se connecter',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ],
+          ),
         ],
       ),
     );

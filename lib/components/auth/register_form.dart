@@ -1,7 +1,4 @@
 // lib/components/auth/register_form.dart
-// Création de RegisterForm comme dans votre JS RegisterForm.js, adapté à Flutter.
-// Utilise RegisterViewModel pour la logique, et appelle onRoleUpdate sur succès.
-// Style conservé similaire.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/auth/register_viewmodel.dart';
@@ -30,86 +27,166 @@ class _RegisterFormState extends State<RegisterForm> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 24),
+
+                // Name Field
                 TextFormField(
                   onChanged: vm.setName,
                   decoration: InputDecoration(
-                    labelText: 'Nom',
+                    hintText: 'Nom complet',
+                    filled: true,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
                   ),
                   validator: (value) => value!.isEmpty ? 'Nom requis' : null,
                 ),
                 const SizedBox(height: 16),
+
+                // Email Field
                 TextFormField(
                   onChanged: vm.setEmail,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    labelText: 'Email',
+                    hintText: 'Email',
+                    filled: true,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
                   ),
-                  validator: (value) => value!.isEmpty ? 'Email requis' : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email requis';
+                    }
+                    if (!value.contains('@')) {
+                      return 'Email invalide';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
+
+                // Password Field
                 TextFormField(
                   onChanged: vm.setPassword,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: 'Mot de passe',
+                    hintText: 'Mot de passe',
+                    filled: true,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey[100],
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
                   ),
-                  validator: (value) => value!.isEmpty ? 'Mot de passe requis' : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Mot de passe requis';
+                    }
+                    if (value.length < 6) {
+                      return 'Au moins 6 caractères';
+                    }
+                    return null;
+                  },
                 ),
+
+                // Error Message
+                if (vm.error != null) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    vm.error!,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+
                 const SizedBox(height: 24),
+
+                // Register Button
                 ElevatedButton(
                   onPressed: vm.loading
                       ? null
                       : () async {
                     if (_formKey.currentState!.validate()) {
                       final result = await vm.register();
-                      if (result != null) {
+                      if (result != null && mounted) {
                         widget.onRoleUpdate(result['role'] ?? 'student');
                         if (result['role'] == 'admin') {
-                          Navigator.pushNamed(context, '/admin-dashboard');
+                          Navigator.pushReplacementNamed(context, '/admin');
                         } else {
-                          Navigator.pushNamed(context, '/dashboard');
+                          Navigator.pushReplacementNamed(context, '/home');
                         }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(vm.error ?? 'Erreur inconnue')),
-                        );
                       }
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[600],
+                    backgroundColor: const Color(0xFF2563EB),
                     foregroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 48),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    elevation: 0,
                   ),
                   child: vm.loading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('S\'inscrire'),
-                ),
-                if (vm.error != null) ...[
-                  const SizedBox(height: 16),
-                  Text(
-                    vm.error!,
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                      : const Text(
+                    'S\'inscrire',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ],
+                ),
               ],
             ),
           );

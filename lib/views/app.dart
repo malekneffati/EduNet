@@ -13,87 +13,64 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("🚀 [APP] ===== DÉBUT BUILD APP =====");
+    print("🚀 [APP] Building App");
 
     return ChangeNotifierProvider(
       create: (_) => AuthViewModel(),
       child: Consumer<AuthViewModel>(
         builder: (context, authViewModel, child) {
-          print("📊 [APP] État AuthViewModel:");
-          print("   - loading: ${authViewModel.loading}");
-          print("   - isAuthenticated: ${authViewModel.isAuthenticated}");
-          print("   - user: ${authViewModel.user?.email}");
-
-          final homeContent = _buildHomeContent(authViewModel);
-          print("🏠 [APP] Home content: ${homeContent.runtimeType}");
-
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: "EduNet",
-            // ✅ UTILISATION DE HOME (recommandé)
-            home: homeContent,
-            // ✅ ROUTES POUR LES AUTRES PAGES
+            theme: ThemeData(
+              primaryColor: const Color(0xFF1E3A8A),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF1E3A8A),
+              ),
+            ),
+
+            // ✅ ALWAYS START AT HOME (PUBLIC PAGE)
+            home: authViewModel.loading
+                ? _buildLoadingScreen()
+                : const HomeView(),
+
+            // ✅ DEFINE ALL ROUTES
             routes: {
-              '/login': (context) {
-                print("🔄 [ROUTE] Navigation vers /login");
-                return LoginView(
-                  updateRole: (role) {
-                    print("🎯 [ROUTE] Role mis à jour: $role");
-                  },
-                );
-              },
-              '/catalog': (context) {
-                print("🔄 [ROUTE] Navigation vers /catalog");
-                return const CatalogView();
-              },
+              '/home': (context) => const HomeView(),
+              '/catalog': (context) => const CatalogView(),
+              '/subscription': (context) => const SubscriptionView(),
+              '/login': (context) => LoginView(
+                updateRole: (role) {
+                  print("🎯 [APP] Role updated: $role");
+                },
+              ),
+              // ✅ FIXED: Dashboard checks auth but DOESN'T redirect on logout
               '/dashboard': (context) {
-                print("🔄 [ROUTE] Navigation vers /dashboard");
+                // Check if authenticated
+                if (!authViewModel.isAuthenticated) {
+                  print("🔒 [APP] Not authenticated - showing login");
+                  // Show login instead of redirecting
+                  return LoginView(
+                    updateRole: (role) {
+                      print("🎯 [APP] Role updated: $role");
+                    },
+                  );
+                }
                 return const DashboardView();
               },
-              '/subscription': (context) {
-                print("🔄 [ROUTE] Navigation vers /subscription");
-                return const SubscriptionView();
-              },
             },
-            onGenerateRoute: (settings) {
-              print("🛣️ [ROUTE] onGenerateRoute appelé: ${settings.name}");
-              return null;
-            },
+
+            // ✅ HANDLE UNKNOWN ROUTES - GO TO HOME (NO BLACK SCREEN)
             onUnknownRoute: (settings) {
-              print("❌ [ROUTE] Route inconnue: ${settings.name}");
+              print("⚠️ [APP] Unknown route: ${settings.name} - Redirecting to home");
               return MaterialPageRoute(
-                builder: (context) => Scaffold(
-                  appBar: AppBar(title: const Text('Page non trouvée')),
-                  body: Center(child: Text('Route ${settings.name} non trouvée')),
-                ),
+                builder: (context) => const HomeView(),
               );
             },
           );
         },
       ),
     );
-  }
-
-  Widget _buildHomeContent(AuthViewModel authViewModel) {
-    print("🔄 [APP] Construction du contenu HOME...");
-
-    if (authViewModel.loading) {
-      print("⏳ [APP] ÉTAT: Loading - Affichage spinner");
-      return _buildLoadingScreen();
-    }
-
-    if (authViewModel.isAuthenticated) {
-      print("✅ [APP] ÉTAT: Authentifié - Redirection vers HomeView");
-      return const HomeView();
-    } else {
-      print("🔐 [APP] ÉTAT: Non authentifié - Redirection vers LoginView");
-      return LoginView(
-        updateRole: (role) {
-          print("🔄 [APP] Callback updateRole déclenché: $role");
-          _handleRoleUpdate(role, authViewModel);
-        },
-      );
-    }
   }
 
   Widget _buildLoadingScreen() {
@@ -112,14 +89,5 @@ class App extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _handleRoleUpdate(String role, AuthViewModel authViewModel) {
-    print("🎯 [APP] Traitement updateRole: $role");
-
-    // Ici vous pouvez mettre à jour le AuthViewModel si nécessaire
-    // Par exemple: authViewModel.updateRole(role);
-
-    print("✅ [APP] Role traité: $role");
   }
 }

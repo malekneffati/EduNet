@@ -10,11 +10,11 @@ class WhyChoose extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: const Color(0xFFF3F4F6),
-      padding: const EdgeInsets.symmetric(vertical: 64),
+      padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 16),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 1280),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Pourquoi choisir EduNet ?',
@@ -37,28 +37,59 @@ class WhyChoose extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 bool isMobile = constraints.maxWidth < 768;
-                return GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: isMobile ? 1 : 3,
-                  crossAxisSpacing: 32,
-                  mainAxisSpacing: 32,
-                  childAspectRatio: 3,
+
+                if (isMobile) {
+                  // Mobile: Stack vertically, no grid
+                  return Column(
+                    children: [
+                      _buildCard(
+                        icon: FontAwesomeIcons.award,
+                        title: 'Qualité',
+                        description: 'Cours créés par des experts reconnus',
+                      ),
+                      const SizedBox(height: 32),
+                      _buildCard(
+                        icon: FontAwesomeIcons.universalAccess,
+                        title: 'Accessibilité',
+                        description: 'Apprenez à votre rythme',
+                      ),
+                      const SizedBox(height: 32),
+                      _buildCard(
+                        icon: FontAwesomeIcons.chartBar,
+                        title: 'Suivi',
+                        description: 'Suivez votre progression',
+                      ),
+                    ],
+                  );
+                }
+
+                // Desktop: Grid
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildCard(
-                      icon: FontAwesomeIcons.award,
-                      title: 'Qualité',
-                      description: 'Cours créés par des experts reconnus dans leur domaine',
+                    Expanded(
+                      child: _buildCard(
+                        icon: FontAwesomeIcons.award,
+                        title: 'Qualité',
+                        description: 'Cours créés par des experts reconnus dans leur domaine',
+                      ),
                     ),
-                    _buildCard(
-                      icon: FontAwesomeIcons.universalAccess,
-                      title: 'Accessibilité',
-                      description: 'Apprenez à votre rythme, où que vous soyez',
+                    const SizedBox(width: 32),
+                    Expanded(
+                      child: _buildCard(
+                        icon: FontAwesomeIcons.universalAccess,
+                        title: 'Accessibilité',
+                        description: 'Apprenez à votre rythme, où que vous soyez',
+                      ),
                     ),
-                    _buildCard(
-                      icon: FontAwesomeIcons.chartBar,
-                      title: 'Suivi',
-                      description: 'Suivez votre progression et obtenez des certificats',
+                    const SizedBox(width: 32),
+                    Expanded(
+                      child: _buildCard(
+                        icon: FontAwesomeIcons.chartBar,
+                        title: 'Suivi',
+                        description: 'Suivez votre progression et obtenez des certificats',
+                      ),
                     ),
                   ],
                 );
@@ -70,14 +101,19 @@ class WhyChoose extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({required IconData icon, required String title, required String description}) {
+  Widget _buildCard({
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 64,
           height: 64,
-          decoration: BoxDecoration(
-            color: const Color(0xFFDBEAFE),
+          decoration: const BoxDecoration(
+            color: Color(0xFFDBEAFE),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: const Color(0xFF2563EB), size: 32),
@@ -95,6 +131,7 @@ class WhyChoose extends StatelessWidget {
           description,
           style: const TextStyle(
             color: Color(0xFF4B5563),
+            fontSize: 14,
           ),
           textAlign: TextAlign.center,
         ),

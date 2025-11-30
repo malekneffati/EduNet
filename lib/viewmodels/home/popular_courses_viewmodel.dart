@@ -18,7 +18,12 @@ class PopularCoursesViewModel extends ChangeNotifier {
 
   Future<void> loadPopularCourses() async {
     try {
-      final snap = await FirebaseFirestore.instance.collection('courses').get();
+      print("📚 [PopularCourses] Loading popular courses...");
+
+      final snap = await FirebaseFirestore.instance
+          .collection('courses')
+          .where('status', isEqualTo: 'active')
+          .get();
 
       final courseList = <CourseModel>[];
 
@@ -26,31 +31,60 @@ class PopularCoursesViewModel extends ChangeNotifier {
         final courseId = courseDoc.id;
         final courseData = courseDoc.data();
 
-        final reviewsSnap = await FirebaseFirestore.instance
-            .collection('courses')
-            .doc(courseId)
-            .collection('reviews')
-            .get();
+        // Try to get reviews for rating calculation
+        double avgRating = 0.0;
+        try {
+          final reviewsSnap = await FirebaseFirestore.instance
+              .collection('courses')
+              .doc(courseId)
+              .collection('reviews')
+              .get();
 
-        final reviews = reviewsSnap.docs.map((d) => d.data()['rating'] as num).toList();
+          if (reviewsSnap.docs.isNotEmpty) {
+            final reviews = reviewsSnap.docs
+                .map((d) => (d.data()['rating'] as num).toDouble())
+                .toList();
+            avgRating = reviews.reduce((a, b) => a + b) / reviews.length;
+          }
+        } catch (e) {
+          print("⚠️ [PopularCourses] No reviews for course $courseId");
+          avgRating = 0.0;
+        }
 
-        final avgRating = reviews.isNotEmpty
-            ? (reviews.reduce((a, b) => a + b) / reviews.length).toStringAsFixed(1)
-            : '0.0';
-
-        courseList.add(CourseModel(
+        // Create course model with all required fields
+        final course = CourseModel(
           id: courseId,
           title: courseData['title'] ?? '',
           description: courseData['description'] ?? '',
+          category: courseData['category'] ?? '',
           price: (courseData['price'] ?? 0).toDouble(),
-          rating: double.parse(avgRating),
-          // Add other fields if needed
-        ));
+          isFree: courseData['isFree'] ?? false,
+          instructor: courseData['instructor'] ?? '',
+          duration: courseData['duration'] ?? '',
+          status: courseData['status'] ?? 'active',
+          videoUrl: courseData['videoUrl'],
+          pdfUrl: courseData['pdfUrl'],
+          createdBy: courseData['createdBy'],
+          createdAt: courseData['createdAt'] != null
+              ? DateTime.parse(courseData['createdAt'])
+              : null,
+          updatedAt: courseData['updatedAt'] != null
+              ? DateTime.parse(courseData['updatedAt'])
+              : null,
+        );
+
+        courseList.add(course);
       }
 
-      courseList.sort((a, b) => b.rating.compareTo(a.rating));
+      // Sort by rating (you can change this to sort by enrollment count, etc.)
+      courseList.sort((a, b) => b.price.compareTo(a.price)); // Temporary sort by price
+
       _courses = courseList.take(3).toList();
+
+      print("✅ [PopularCourses] Loaded ${_courses.length} popular courses");
+
     } catch (err) {
+      print("❌ [PopularCourses] Error: $err");
       _error = 'Impossible de charger les cours populaires';
     } finally {
       _loading = false;
