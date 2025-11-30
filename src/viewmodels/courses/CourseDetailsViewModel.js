@@ -105,24 +105,32 @@ export default function useCourseDetailsViewModel(courseId) {
     }
 
     try {
+      // Préparer les données pour le backend
+      const body = {
+        amount: course.price,
+        note: `Achat du cours : ${course.title}`,
+        firstName: user.displayName || "User",
+        lastName: user.lastName || "", // si tu as un champ lastName
+        email: user.email,
+        phone: user.phone || "+21600000000",
+        returnUrl: `${window.location.origin}/payment-success?courseId=${courseId}`,
+        cancelUrl: `${window.location.origin}/courses`,
+      };
+
+      console.log("Envoi au backend :", body);
+
+      // Appel au backend Render
       const response = await fetch(
         "https://edunet-5n83.onrender.com/createPayment",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: course.price,
-            note: `Achat du cours : ${course.title}`,
-            firstName: user.displayName || "User",
-            lastName: "",
-            email: user.email,
-            returnUrl: `${window.location.origin}/payment-success?courseId=${courseId}`,
-            cancelUrl: `${window.location.origin}/courses`,
-          }),
+          body: JSON.stringify(body),
         }
       );
 
       const data = await response.json();
+      console.log("Réponse backend :", data);
 
       if (!data.payment_url) {
         alert("Erreur lors de la création du paiement.");
@@ -132,10 +140,11 @@ export default function useCourseDetailsViewModel(courseId) {
       // Redirection vers Paymee
       window.location.href = data.payment_url;
     } catch (err) {
-      console.error(err);
-      alert("Erreur lors du paiement.");
+      console.error("Erreur lors du paiement :", err);
+      alert("Erreur lors du paiement. Veuillez réessayer plus tard.");
     }
   };
+
 
   return {
     course,

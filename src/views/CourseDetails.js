@@ -2,7 +2,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import useCourseDetailsViewModel from "../viewmodels/courses/CourseDetailsViewModel";
-import PaymentViewModel from "../viewmodels/courses/PaymentViewModel";
 
 const CourseDetails = () => {
   const { id } = useParams();
