@@ -1,3 +1,4 @@
+// src/viewmodels/courses/CourseDetailsViewModel.js
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -11,7 +12,6 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
-import PaymentModel from "../../models/PaymentModel";
 import CourseAccessViewModel from "./CourseAccessViewModel";
 
 export default function useCourseDetailsViewModel(courseId) {
@@ -97,42 +97,40 @@ export default function useCourseDetailsViewModel(courseId) {
     }
   };
 
-  // Paiement Paymee
+  // Paiement via backend Render
   const handlePayment = async () => {
-    if (!auth.currentUser) {
+    if (!user) {
       alert("Vous devez être connecté.");
       return;
     }
 
     try {
       const response = await fetch(
-        "https://sandbox.paymee.tn/api/v2/payments/create",
+        "https://edunet-5n83.onrender.com/createPayment",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${process.env.REACT_APP_PAYMEE_API_KEY}`,
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount: course.price,
             note: `Achat du cours : ${course.title}`,
-            first_name: auth.currentUser.displayName || "User",
-            last_name: "",
-            email: auth.currentUser.email,
-            return_url: `${window.location.origin}/payment-success?courseId=${courseId}`,
+            firstName: user.displayName || "User",
+            lastName: "",
+            email: user.email,
+            returnUrl: `${window.location.origin}/payment-success?courseId=${courseId}`,
+            cancelUrl: `${window.location.origin}/courses`,
           }),
         }
       );
 
       const data = await response.json();
 
-      if (!data.data || !data.data.payment_url) {
-        alert("Erreur Paymee");
+      if (!data.payment_url) {
+        alert("Erreur lors de la création du paiement.");
         return;
       }
 
-      // Redirect Paymee payment page
-      window.location.href = data.data.payment_url;
+      // Redirection vers Paymee
+      window.location.href = data.payment_url;
     } catch (err) {
       console.error(err);
       alert("Erreur lors du paiement.");
