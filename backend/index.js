@@ -1,14 +1,30 @@
-// EduNet/backend/index.js
+// backend/index.js
+
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
-import "dotenv/config"; 
+import "dotenv/config";
+
+// 🔥 Firebase Admin (backend)
+
+import admin from "firebase-admin";
+import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+const firestore = admin.firestore();
+
+// Paymee API
 
 const BASE_URL = "https://sandbox.paymee.tn/api/v2";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// 🔹 1) CREATE PAYMENT — Appelée par React
 
 app.post("/createPayment", async (req, res) => {
   const {
@@ -23,9 +39,7 @@ app.post("/createPayment", async (req, res) => {
     orderId,
   } = req.body;
 
-  // Vérification clé API
   if (!process.env.PAYMEE_API_KEY) {
-    console.error("PAYMEE_API_KEY manquant !");
     return res.status(500).json({ message: "Clé Paymee non configurée" });
   }
 
@@ -35,15 +49,12 @@ app.post("/createPayment", async (req, res) => {
       note: note || "Achat cours",
       first_name: firstName || "User",
       last_name: lastName || "Unknown",
-      email: email || "user@example.com",
+      email: email,
       phone: phone || "+21600000000",
       return_url: returnUrl,
       cancel_url: cancelUrl,
-      webhook_url: process.env.PAYMEE_WEBHOOK_URL || "",
       order_id: orderId || "EDUNET-ORDER",
     };
-
-    console.log("Body envoyé à Paymee :", JSON.stringify(payload, null, 2));
 
     const response = await fetch(`${BASE_URL}/payments/create`, {
       method: "POST",
@@ -54,19 +65,11 @@ app.post("/createPayment", async (req, res) => {
       body: JSON.stringify(payload),
     });
 
-    console.log("Status HTTP Paymee :", response.status);
-
     const data = await response.json();
-    console.log("Réponse Paymee :", JSON.stringify(data, null, 2));
 
     if (!response.ok) {
-      console.error("Erreur Paymee:", data);
+      console.log("Erreur Paymee:", data);
       return res.status(response.status).json(data);
-    }
-
-    if (!data.data?.token || !data.data?.payment_url) {
-      console.error("Réponse Paymee invalide :", data);
-      return res.status(500).json({ message: "Payment_url manquant" });
     }
 
     return res.json({
@@ -74,10 +77,51 @@ app.post("/createPayment", async (req, res) => {
       payment_url: data.data.payment_url,
     });
   } catch (err) {
-    console.error("Erreur backend :", err);
-    return res.status(500).json({ message: "Erreur serveur" });
+    console.log("Erreur backend createPayment :", err);
+    return res.status(500).json({ message: "Erreur serveur backend" });
   }
 });
+
+// 🔹 2) PAYMENT SUCCESS — Redirection Paymee → Render backend
+
+app.get("/payment-success", async (req, res) => {
+  const { courseId, userId, payment_token, returnUrl } = req.query;
+
+  if (!payment_token) return res.status(400).send("payment_token manquant");
+
+  try {
+    // 🔎 Vérification du paiement Paymee
+    const verify = await fetch(`${BASE_URL}/payments/${payment_token}`, {
+      headers: { Authorization: `Token ${process.env.PAYMEE_API_KEY}` },
+    });
+    const data = await verify.json();
+    console.log("Paymee verify response:", data);
+
+    if (data.status !== 200 || data.data?.payment_status !== "ENDED") {
+      return res.status(400).send("Paiement non validé");
+    }
+
+    await firestore
+      .collection("users")
+      .doc(userId)
+      .collection("myCourses")
+      .doc(courseId)
+      .set({
+        joinedAt: admin.firestore.FieldValue.serverTimestamp(),
+        progress: 0,
+        courseId,
+      });
+
+    // 🔁 Rediriger vers frontend
+    if (returnUrl) return res.redirect(returnUrl);
+    return res.send("Cours ajouté avec succès !");
+  } catch (err) {
+    console.error("Erreur Paymee :", err);
+    return res.status(500).send("Erreur interne");
+  }
+});
+
+// 🚀 Start server
 
 const PORT = process.env.PORT || 10001;
 app.listen(PORT, () => console.log("Server running on port " + PORT));

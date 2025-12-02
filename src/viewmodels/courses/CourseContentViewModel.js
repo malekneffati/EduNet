@@ -1,3 +1,4 @@
+//src/viewmodels/courses/CourseContentViewModel.js
 import { useEffect, useState } from "react";
 import {
   doc,
@@ -72,15 +73,14 @@ const useCourseContentViewModel = (courseId) => {
       return;
     }
 
-    const q = query(
-      collection(db, "purchases"),
-      where("courseId", "==", courseId),
-      where("userId", "==", user.uid),
-      where("status", "==", "success")
-    );
-
-    const snap = await getDocs(q);
-    setAllowed(!snap.empty);
+    try {
+      const courseRef = doc(db, "users", user.uid, "myCourses", courseId);
+      const snap = await getDoc(courseRef);
+      setAllowed(snap.exists());
+    } catch (err) {
+      console.error("Erreur checkAccess:", err);
+      setAllowed(false);
+    }
   };
 
   // ------------------------------

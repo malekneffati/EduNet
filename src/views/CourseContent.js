@@ -1,3 +1,4 @@
+//src/views/CourseContent.js
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useCourseContentViewModel from "../viewmodels/courses/CourseContentViewModel";

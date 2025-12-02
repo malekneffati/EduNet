@@ -1,3 +1,4 @@
+//src/views/ProtectedCourse.js
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CourseAccessViewModel from "../viewmodels/courses/CourseAccessViewModel";

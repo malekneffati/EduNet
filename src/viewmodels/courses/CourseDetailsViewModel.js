@@ -1,4 +1,3 @@
-// src/viewmodels/courses/CourseDetailsViewModel.js
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -13,6 +12,7 @@ import {
 import { auth, db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import CourseAccessViewModel from "./CourseAccessViewModel";
+import PaymentViewModel from "../../viewmodels/courses/PaymentViewModel";
 
 export default function useCourseDetailsViewModel(courseId) {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function useCourseDetailsViewModel(courseId) {
   const [canAccessCourse, setCanAccessCourse] = useState(false);
 
   const user = auth.currentUser;
-  const userId = user ? user.uid : null;
+  const userId = user?.uid;
 
   // Vérifier l'accès au cours
   useEffect(() => {
@@ -74,7 +74,9 @@ export default function useCourseDetailsViewModel(courseId) {
 
   const averageRating =
     reviews.length > 0
-      ? (reviews.reduce((a, b) => a + b.rating, 0) / reviews.length).toFixed(1)
+      ? (
+          reviews.reduce((a, b) => a + (b.rating || 0), 0) / reviews.length
+        ).toFixed(1)
       : 0;
 
   // Rejoindre cours gratuit
@@ -97,54 +99,24 @@ export default function useCourseDetailsViewModel(courseId) {
     }
   };
 
-  // Paiement via backend Render
+  // Paiement via PaymentViewModel
   const handlePayment = async () => {
-    if (!user) {
+    if (!userId) {
       alert("Vous devez être connecté.");
       return;
     }
-
     try {
-      // Préparer les données pour le backend
-      const body = {
-        amount: course.price,
-        note: `Achat du cours : ${course.title}`,
-        firstName: user.displayName || "User",
-        lastName: user.lastName || "", // si tu as un champ lastName
-        email: user.email,
-        phone: user.phone || "+21600000000",
-        returnUrl: `${window.location.origin}/payment-success?courseId=${courseId}`,
-        cancelUrl: `${window.location.origin}/courses`,
-      };
-
-      console.log("Envoi au backend :", body);
-
-      // Appel au backend Render
-      const response = await fetch(
-        "https://edunet-5n83.onrender.com/createPayment",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        }
-      );
-
-      const data = await response.json();
-      console.log("Réponse backend :", data);
-
-      if (!data.payment_url) {
+      const paymentData = await PaymentViewModel.startPayment(course, userId);
+      if (paymentData?.payment_url) {
+        window.location.href = paymentData.payment_url;
+      } else {
         alert("Erreur lors de la création du paiement.");
-        return;
       }
-
-      // Redirection vers Paymee
-      window.location.href = data.payment_url;
     } catch (err) {
-      console.error("Erreur lors du paiement :", err);
-      alert("Erreur lors du paiement. Veuillez réessayer plus tard.");
+      console.error("Erreur paiement :", err);
+      alert("Erreur lors du paiement.");
     }
   };
-
 
   return {
     course,
