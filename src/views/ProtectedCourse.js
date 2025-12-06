@@ -8,7 +8,6 @@ export default function ProtectedCourse({ children }) {
 
   useEffect(() => {
     const checkAccess = async () => {
-      // On prend auth.currentUser.uid si l'utilisateur est connecté
       const userId = localStorage.getItem("userId");
       console.log(
         "Checking course access for userId:",
@@ -27,10 +26,8 @@ export default function ProtectedCourse({ children }) {
     checkAccess();
   }, [courseId]);
 
-  if (allowed === null) {
+  if (allowed === null)
     return <p className="text-center mt-20">Vérification d'accès...</p>;
-  }
 
-  // Autorisé ou non → laisser CourseContent gérer le rendu
   return children;
 }

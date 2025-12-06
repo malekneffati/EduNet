@@ -145,7 +145,6 @@ export default function useCourseDetailsViewModel(courseId) {
 
       console.log("✅ Transaction enregistrée côté frontend");
 
-      // Redirection vers Paymee
       window.location.href = data.payment_url;
     } catch (err) {
       console.error("Erreur lors du paiement :", err);
