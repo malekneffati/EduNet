@@ -1,5 +1,3 @@
-// EduNet/backend/index.js
-
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -7,7 +5,9 @@ import "dotenv/config";
 
 // Firebase Admin
 import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
+import { createRequire } from "module"; // <-- ajoute cette ligne
+const require = createRequire(import.meta.url);
+const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -51,11 +51,7 @@ app.post("/createPayment", async (req, res) => {
         phone,
         return_url: returnUrl,
         cancel_url: cancelUrl,
-
-        // 🔥 Callback backend
         callback_url: "https://edunet-1bqg.onrender.com/paymeeCallback",
-
-        // 🔥 On envoie user + cours dans metadata
         metadata: {
           userId,
           courseId,
@@ -86,7 +82,6 @@ app.post("/paymeeCallback", async (req, res) => {
   try {
     const { status, payment_token, transaction_id, metadata } = req.body;
 
-    // Vérifier paiement confirmé par Paymee
     if (status !== "completed") {
       console.log("❌ Paiement NON confirmé");
       return res.status(400).send("Payment not completed");
@@ -99,7 +94,6 @@ app.post("/paymeeCallback", async (req, res) => {
       return res.status(400).send("Missing metadata");
     }
 
-    // 🔥 Ajouter le cours à Firestore
     await db
       .collection("users")
       .doc(userId)
