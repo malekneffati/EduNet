@@ -1,6 +1,7 @@
 // lib/views/login_view.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../viewmodels/auth/login_viewmodel.dart';
 import '../components/auth/login_form.dart';
 import '../components/auth/register_form.dart';
@@ -80,7 +81,7 @@ class _LoginViewState extends State<LoginView> {
       alignment: Alignment.centerLeft,
       child: GestureDetector(
         onTap: () {
-          Navigator.pushReplacementNamed(context, '/home');
+          context.go('/home');
         },
         child: const Icon(
           Icons.arrow_back,
@@ -199,9 +200,9 @@ class _LoginViewState extends State<LoginView> {
         if (result != null && mounted) {
           widget.updateRole(result['role'] ?? 'student');
           if (result['role'] == 'admin') {
-            Navigator.pushReplacementNamed(context, '/admin');
+            context.go('/admin');
           } else {
-            Navigator.pushReplacementNamed(context, '/home');
+            context.go('/home');
           }
         } else if (vm.error != null && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

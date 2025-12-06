@@ -1,5 +1,6 @@
 // lib/components/catalog/course_card.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/course_model.dart';
 
 class CourseCard extends StatelessWidget {
@@ -20,8 +21,7 @@ class CourseCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           print("📖 [CourseCard] Clicked on course: ${course.title}");
-          // TODO: Navigate to course details
-          // Navigator.pushNamed(context, '/course-details', arguments: course.id);
+          context.push('/course/${course.id}', extra: course);
         },
         borderRadius: BorderRadius.circular(12),
         child: Column(

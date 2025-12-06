@@ -1,6 +1,7 @@
 // lib/components/auth/login_form.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../viewmodels/auth/login_viewmodel.dart';
 
 class LoginForm extends StatefulWidget {
@@ -121,9 +122,9 @@ class _LoginFormState extends State<LoginForm> {
                 if (result != null && mounted) {
                   widget.onRoleUpdate(result['role'] ?? 'student');
                   if (result['role'] == 'admin') {
-                    Navigator.pushReplacementNamed(context, '/admin');
+                    context.go('/admin');
                   } else {
-                    Navigator.pushReplacementNamed(context, '/home');
+                    context.go('/home');
                   }
                 }
               }

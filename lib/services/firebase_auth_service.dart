@@ -1,10 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
 
 class FirebaseAuthService {
-  Stream<User?> get authStateChanges =>
-      FirebaseAuth.instance.authStateChanges();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  User? getCurrentUser() {
+    return _auth.currentUser;
+  }
 
   Future<UserModel> getUserData(String uid) async {
     final docSnap = await FirebaseFirestore.instance
@@ -20,3 +26,8 @@ class FirebaseAuthService {
     return UserModel.fromFirestore(data, uid);
   }
 }
+
+// Provider for FirebaseAuthService
+final authServiceProvider = Provider<FirebaseAuthService>((ref) {
+  return FirebaseAuthService();
+});

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:edunet/viewmodels/auth/auth_viewmodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -49,11 +50,7 @@ class _NavbarState extends State<Navbar> {
 
       // 🔥 ALWAYS redirect to login page after logout
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/login',
-              (route) => false,
-        );
+        context.go('/login');
       }
 
     } catch (err) {
@@ -121,7 +118,7 @@ class _NavbarState extends State<Navbar> {
       children: [
         // Logo
         GestureDetector(
-          onTap: () => Navigator.pushNamed(context, '/home'),
+          onTap: () => context.go('/home'),
           child: Text(
             'EduNet',
             style: GoogleFonts.poppins(
@@ -169,7 +166,7 @@ class _NavbarState extends State<Navbar> {
                 child: const Text('Se déconnecter'),
               )
                   : ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/login'),
+                onPressed: () => context.go('/login'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2563EB),
                   foregroundColor: Colors.white,
@@ -197,7 +194,7 @@ class _NavbarState extends State<Navbar> {
       children: [
         // Logo
         GestureDetector(
-          onTap: () => Navigator.pushNamed(context, '/home'),
+          onTap: () => context.go('/home'),
           child: Text(
             'EduNet',
             style: GoogleFonts.poppins(
@@ -268,7 +265,7 @@ class _NavbarState extends State<Navbar> {
                     : ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.pushNamed(context, '/login');
+                    context.go('/login');
                   },
                   icon: const Icon(Icons.login),
                   label: const Text('Se Connecter'),
@@ -293,7 +290,7 @@ class _NavbarState extends State<Navbar> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: TextButton(
-        onPressed: () => Navigator.pushNamed(context, route),
+        onPressed: () => context.go(route),
         child: Text(
           label,
           style: const TextStyle(
@@ -323,7 +320,7 @@ class _NavbarState extends State<Navbar> {
       ),
       onTap: () {
         Navigator.pop(context); // Close menu
-        Navigator.pushNamed(context, route);
+        context.go(route);
       },
     );
   }
