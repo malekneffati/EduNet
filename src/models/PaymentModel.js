@@ -2,18 +2,9 @@
 class PaymentModel {
   constructor() {
     // URL de ton backend Render
-    this.FUNCTION_URL = "https://edunet-5n83.onrender.com/createPayment";
+    this.FUNCTION_URL = "https://edunet-1bqg.onrender.com/createPayment";
   }
 
-  /**
-   * Crée un paiement via Render -> Paymee
-   * @param {number} amount
-   * @param {string} note
-   * @param {string} returnUrl
-   * @param {string} cancelUrl
-   * @param {object} user {firstName, lastName, email, phone, name}
-   * @returns {Promise<{token, payment_url}>}
-   */
   async createPayment(amount, note, returnUrl, cancelUrl, user) {
     if (!amount || isNaN(amount)) throw new Error("Montant invalide");
 

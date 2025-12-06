@@ -3,12 +3,7 @@ import { db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 class CourseAccessViewModel {
-  /**
-   * Vérifie si un utilisateur a accès à un cours
-   * @param {string} userId
-   * @param {string} courseId
-   * @returns {boolean}
-   */
+
   async userHasAccess(userId, courseId) {
     if (!userId) return false;
 

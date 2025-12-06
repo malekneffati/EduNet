@@ -6,13 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 class PaymentViewModel {
   loading = false;
   error = null;
-
-  /**
-   * Démarre le paiement pour un cours et retourne l'URL de redirection
-   * @param {object} course {id, title, price}
-   * @param {string} userId
-   * @returns {Promise<{token, payment_url}>}
-   */
+  
   async startPayment(course, userId) {
     this.loading = true;
     this.error = null;
@@ -32,7 +26,7 @@ class PaymentViewModel {
         lastName = parts.slice(1).join(" ");
       }
 
-      const returnUrl = `https://edunet-1574d.web.app/course/payment-success?courseId=${course.id}&userId=${userId}`;
+      const returnUrl = `https://edunet-1574d.web.app/course/${course.id}/content`;
       const cancelUrl = "https://edunet-1574d.web.app/course/payment-cancel";
 
       // Appeler le backend Render
@@ -51,7 +45,7 @@ class PaymentViewModel {
       );
 
       this.loading = false;
-      return paymentData; // { token, payment_url }
+      return paymentData; 
     } catch (err) {
       console.error("Erreur démarrage paiement :", err);
       this.loading = false;
