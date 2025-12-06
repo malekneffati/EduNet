@@ -1,18 +1,9 @@
+// EduNet/backend/index.js
+
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
 import "dotenv/config";
-
-// Firebase Admin
-import admin from "firebase-admin";
-const serviceAccount = JSON.parse(
-  process.env.FIREBASE_SERVICE_ACCOUNT.replace(/\\\\n/g, "\n")
-);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-
-const db = admin.firestore();
 
 const BASE_URL = "https://sandbox.paymee.tn/api/v2";
 
@@ -30,8 +21,7 @@ app.post("/createPayment", async (req, res) => {
     phone,
     returnUrl,
     cancelUrl,
-    userId,
-    courseId,
+    orderId,
   } = req.body;
 
   try {
@@ -50,11 +40,8 @@ app.post("/createPayment", async (req, res) => {
         phone,
         return_url: returnUrl,
         cancel_url: cancelUrl,
-        callback_url: "https://edunet-1bqg.onrender.com/paymeeCallback",
-        metadata: {
-          userId,
-          courseId,
-        },
+        webhook_url: process.env.PAYMEE_WEBHOOK_URL,
+        order_id: orderId || "EDUNET-ORDER",
       }),
     });
 
@@ -70,48 +57,10 @@ app.post("/createPayment", async (req, res) => {
       payment_url: data.data?.payment_url,
     });
   } catch (err) {
-    console.error("Erreur backend createPayment:", err);
+    console.error("Erreur backend :", err);
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
 
-app.post("/paymeeCallback", async (req, res) => {
-  console.log("🔥 Callback Paymee reçu :", req.body);
-
-  try {
-    const { status, payment_token, transaction_id, metadata } = req.body;
-
-    if (status !== "completed") {
-      console.log("❌ Paiement NON confirmé");
-      return res.status(400).send("Payment not completed");
-    }
-
-    const { userId, courseId } = metadata || {};
-
-    if (!userId || !courseId) {
-      console.error("❌ Metadata manquants !");
-      return res.status(400).send("Missing metadata");
-    }
-
-    await db
-      .collection("users")
-      .doc(userId)
-      .collection("myCourses")
-      .doc(courseId)
-      .set({
-        joinedAt: admin.firestore.Timestamp.now(),
-        progress: 0,
-        transactionId: transaction_id,
-        token: payment_token,
-      });
-
-    console.log("✅ Cours ajouté dans Firestore après paiement confirmé !");
-    res.status(200).send("OK");
-  } catch (err) {
-    console.error("Erreur callback Paymee :", err);
-    res.status(500).send("Callback error");
-  }
-});
-
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log("🚀 Server running on port " + PORT));
+app.listen(PORT, () => console.log("Server running on port " + PORT));
