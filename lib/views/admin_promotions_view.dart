@@ -41,12 +41,6 @@ class _AdminPromotionsViewState extends ConsumerState<AdminPromotionsView> {
               ),
             )
           : null,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showPromotionDialog(context, null, vm),
-        icon: const Icon(Icons.add),
-        label: const Text('Nouvelle offre'),
-        backgroundColor: const Color(0xFF4F46E5),
-      ),
       body: Row(
         children: [
           if (!isMobile)
@@ -67,29 +61,71 @@ class _AdminPromotionsViewState extends ConsumerState<AdminPromotionsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Gestion des promotions',
+                          'Gestion des paiements',
                           style: TextStyle(
                             fontSize: isMobile ? 20 : 24,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        if (vm.isLoading)
-                          const Expanded(
-                            child: Center(child: CircularProgressIndicator()),
-                          )
-                        else if (vm.promotions.isEmpty)
-                          const Expanded(
-                            child: Center(
-                              child: Text('Aucune promotion. Créez-en une !'),
+                        const SizedBox(height: 24),
+                        // Bouton Nouvelle promotion
+                        ElevatedButton.icon(
+                          onPressed: () => _showPromotionDialog(context, null, vm),
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('Nouvelle promotion'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4F46E5),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          )
-                        else
-                          Expanded(
-                            child: isMobile
-                                ? _buildMobileList(vm)
-                                : _buildDesktopGrid(vm),
                           ),
+                        ),
+                        const SizedBox(height: 24),
+                        Expanded(
+                          child: isMobile
+                              ? ListView(
+                                  children: [
+                                    _buildSectionTitle('Promotions actives'),
+                                    _buildPromotionsList(vm),
+                                    const SizedBox(height: 24),
+                                    _buildSectionTitle('Options d\'abonnement'),
+                                    _buildSubscriptionOptions(context),
+                                  ],
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          _buildSectionTitle('Promotions actives'),
+                                          if (vm.isLoading)
+                                            const Center(child: CircularProgressIndicator())
+                                          else if (vm.promotions.isEmpty)
+                                            const Center(child: Text('Aucune promotion.'))
+                                          else
+                                            Expanded(child: _buildPromotionsList(vm)),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          _buildSectionTitle('Options d\'abonnement'),
+                                          _buildSubscriptionOptions(context),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
                       ],
                     ),
                   ),
@@ -102,30 +138,171 @@ class _AdminPromotionsViewState extends ConsumerState<AdminPromotionsView> {
     );
   }
 
-  Widget _buildDesktopGrid(PromotionManagementViewModel vm) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.8,
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
       ),
+    );
+  }
+
+  Widget _buildSubscriptionOptions(BuildContext context) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Abonnement annuel (Premium)',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              '200 TND/an',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5)),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Modification du prix à implémenter')));
+              }, 
+              child: const Text('Modifier le prix'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPromotionsList(PromotionManagementViewModel vm) {
+    return ListView.builder(
+      shrinkWrap: true,
       itemCount: vm.promotions.length,
       itemBuilder: (context, index) {
         final promo = vm.promotions[index];
-        return _buildPromotionCard(promo, vm);
+        return _buildSimplePromotionCard(promo, vm);
       },
     );
   }
 
-  Widget _buildMobileList(PromotionManagementViewModel vm) {
-    return ListView.builder(
-      itemCount: vm.promotions.length,
-      itemBuilder: (context, index) {
-        final promo = vm.promotions[index];
-        return _buildPromotionCard(promo, vm);
-      },
+  Widget _buildSimplePromotionCard(PromotionModel promo, PromotionManagementViewModel vm) {
+    return Card(
+      elevation: 1,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        promo.title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      if (promo.isActive)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: const Color(0xFF10B981)),
+                          ),
+                          child: const Text(
+                            'Active',
+                            style: TextStyle(
+                              color: Color(0xFF10B981),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    promo.description,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Expire le ${_formatDate(promo.createdAt.add(const Duration(days: 30)))}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (value) {
+                if (value == 'edit') {
+                  _showPromotionDialog(context, promo, vm);
+                } else if (value == 'delete') {
+                  _showDeleteDialog(context, promo, vm);
+                } else if (value == 'toggle') {
+                  vm.toggleActive(promo.id);
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 18),
+                      SizedBox(width: 8),
+                      Text('Modifier'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'toggle',
+                  child: Row(
+                    children: [
+                      Icon(promo.isActive ? Icons.visibility_off : Icons.visibility, size: 18),
+                      const SizedBox(width: 8),
+                      Text(promo.isActive ? 'Désactiver' : 'Activer'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, size: 18, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Supprimer', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   Widget _buildPromotionCard(PromotionModel promo, PromotionManagementViewModel vm) {

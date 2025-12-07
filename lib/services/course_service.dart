@@ -1,11 +1,18 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../models/course_model.dart';
+import '../models/review_model.dart';
+
 
 class CourseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  // Cloudinary Config - A REMPLIR
+  static const String cloudName = 'VOTRE_CLOUD_NAME'; 
+  static const String uploadPreset = 'VOTRE_UPLOAD_PRESET'; 
+
 
   // Get all courses
   Stream<List<CourseModel>> getCourses() {
@@ -63,30 +70,41 @@ class CourseService {
     }
   }
 
-  // Upload PDF
-  Future<String?> uploadPDF(File file, String courseId) async {
+  // Utils: Upload to Cloudinary
+  Future<String?> _uploadToCloudinary(File file, String resourceType) async {
     try {
-      final ref = _storage.ref().child('courses/$courseId/document.pdf');
-      final uploadTask = await ref.putFile(file);
-      final downloadUrl = await uploadTask.ref.getDownloadURL();
-      return downloadUrl;
+      final uri = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/$resourceType/upload');
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['upload_preset'] = uploadPreset
+        ..files.add(await http.MultipartFile.fromPath('file', file.path));
+
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        final responseData = await response.stream.toBytes();
+        final responseString = String.fromCharCodes(responseData);
+        final jsonMap = jsonDecode(responseString);
+        return jsonMap['secure_url'];
+      } else {
+        final responseData = await response.stream.toBytes();
+        print('Cloudinary Error: ${response.statusCode} - ${String.fromCharCodes(responseData)}');
+        return null;
+      }
     } catch (e) {
-      print('Error uploading PDF: $e');
+      print('Error uploading to Cloudinary: $e');
       return null;
     }
   }
 
+  // Upload PDF (uses Cloudinary 'raw' or 'image' depending on config, here 'auto' or 'raw')
+  Future<String?> uploadPDF(File file, String courseId) async {
+    // Note: resourceType 'raw' is often used for generic files like PDF, or 'image' if you want preview.
+    // Let's try 'auto' or 'raw'.
+    return await _uploadToCloudinary(file, 'raw'); 
+  }
+
   // Upload Video
   Future<String?> uploadVideo(File file, String courseId) async {
-    try {
-      final ref = _storage.ref().child('courses/$courseId/video.mp4');
-      final uploadTask = await ref.putFile(file);
-      final downloadUrl = await uploadTask.ref.getDownloadURL();
-      return downloadUrl;
-    } catch (e) {
-      print('Error uploading video: $e');
-      return null;
-    }
+    return await _uploadToCloudinary(file, 'video');
   }
 
   // Search courses
@@ -121,6 +139,33 @@ class CourseService {
     } catch (e) {
       print('Error getting courses by category: $e');
       return [];
+    }
+  }
+
+  // Get Reviews
+  Stream<List<ReviewModel>> getReviews(String courseId) {
+    return _firestore
+        .collection('courses')
+        .doc(courseId)
+        .collection('reviews')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => ReviewModel.fromMap(doc.data(), doc.id))
+            .toList());
+  }
+
+  // Add Review
+  Future<void> addReview(String courseId, ReviewModel review) async {
+    try {
+      await _firestore
+          .collection('courses')
+          .doc(courseId)
+          .collection('reviews')
+          .add(review.toMap());
+    } catch (e) {
+      print('Error adding review: $e');
+      rethrow;
     }
   }
 }

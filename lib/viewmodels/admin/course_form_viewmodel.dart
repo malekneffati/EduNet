@@ -26,6 +26,9 @@ class CourseFormViewModel extends ChangeNotifier {
   double _uploadProgress = 0.0;
 
   CourseModel? _editingCourse;
+  
+  // Chapters
+  final List<ChapterFormState> _chapters = [];
 
   CourseFormViewModel(this._courseService);
 
@@ -39,6 +42,7 @@ class CourseFormViewModel extends ChangeNotifier {
   bool get isUploading => _isUploading;
   double get uploadProgress => _uploadProgress;
   CourseModel? get editingCourse => _editingCourse;
+  List<ChapterFormState> get chapters => _chapters;
 
   final List<String> categories = [
     'Développement',
@@ -112,6 +116,71 @@ class CourseFormViewModel extends ChangeNotifier {
     _videoFileName = null;
     notifyListeners();
   }
+  
+  // --- Chapter Methods ---
+  
+  void addChapter() {
+    _chapters.add(ChapterFormState(
+      title: '',
+      description: '',
+    ));
+    notifyListeners();
+  }
+  
+  void removeChapter(int index) {
+    if (_chapters.length > 0) {
+        _chapters[index].dispose();
+        _chapters.removeAt(index);
+        notifyListeners();
+    }
+  }
+  
+  Future<void> pickChapterPDF(int index) async {
+      try {
+          final result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: ['pdf'],
+          );
+    
+          if (result != null && result.files.single.path != null) {
+            _chapters[index].pdfFile = File(result.files.single.path!);
+            _chapters[index].pdfFileName = result.files.single.name;
+            notifyListeners();
+          }
+        } catch (e) {
+          print('Error picking chapter PDF: $e');
+        }
+  }
+  
+  Future<void> pickChapterVideo(int index) async {
+       try {
+          final result = await FilePicker.platform.pickFiles(
+            type: FileType.video,
+          );
+    
+          if (result != null && result.files.single.path != null) {
+            _chapters[index].videoFile = File(result.files.single.path!);
+            _chapters[index].videoFileName = result.files.single.name;
+            notifyListeners();
+          }
+        } catch (e) {
+          print('Error picking chapter Video: $e');
+        }
+  }
+  
+  void removeChapterPDF(int index) {
+      _chapters[index].pdfFile = null;
+      _chapters[index].pdfFileName = null;
+      _chapters[index].pdfUrl = null;
+      notifyListeners();
+  }
+  
+   void removeChapterVideo(int index) {
+      _chapters[index].videoFile = null;
+      _chapters[index].videoFileName = null;
+      _chapters[index].videoUrl = null;
+      notifyListeners();
+  }
 
   // Load course for editing
   Future<void> loadCourse(String courseId) async {
@@ -131,6 +200,22 @@ class CourseFormViewModel extends ChangeNotifier {
         _isFree = course.isFree;
         _pdfFileName = course.pdfUrl?.split('/').last;
         _videoFileName = course.videoUrl?.split('/').last;
+        
+        // Load chapters
+        if (course.chapters != null) {
+          _chapters.clear();
+          for (var chapter in course.chapters!) {
+            _chapters.add(ChapterFormState(
+              title: chapter.title,
+              description: chapter.description,
+              pdfUrl: chapter.pdfUrl,
+              videoUrl: chapter.videoUrl,
+            ));
+          }
+        } else {
+             // Initialize with one empty chapter if none
+             if (_chapters.isEmpty) addChapter();
+        }
       }
     } catch (e) {
       print('Error loading course: $e');
@@ -194,7 +279,31 @@ class CourseFormViewModel extends ChangeNotifier {
       _uploadProgress = 0.9;
       notifyListeners();
 
-      // Create course object
+        // Upload chapter files
+        List<ChapterModel> savedChapters = [];
+        for (int i = 0; i < _chapters.length; i++) {
+            var chapterState = _chapters[i];
+            
+            // Upload PDF if new file selected
+            if (chapterState.pdfFile != null) {
+                chapterState.pdfUrl = await _courseService.uploadPDF(chapterState.pdfFile!, '${tempId}_ch$i');
+            }
+            
+            // Upload Video if new file selected
+            if (chapterState.videoFile != null) {
+                chapterState.videoUrl = await _courseService.uploadVideo(chapterState.videoFile!, '${tempId}_ch$i');
+            }
+            
+            savedChapters.add(ChapterModel(
+                id: 'ch_$i', // Generate real ID if needed
+                title: chapterState.titleController.text.trim(),
+                description: chapterState.descriptionController.text.trim(),
+                pdfUrl: chapterState.pdfUrl,
+                videoUrl: chapterState.videoUrl,
+            ));
+        }
+
+        // Create course object
       final course = CourseModel(
         id: _editingCourse?.id ?? '',
         title: titleController.text.trim(),
@@ -207,6 +316,7 @@ class CourseFormViewModel extends ChangeNotifier {
         status: 'active',
         videoUrl: videoUrl,
         pdfUrl: pdfUrl,
+        chapters: savedChapters,
         createdAt: _editingCourse?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -249,6 +359,9 @@ class CourseFormViewModel extends ChangeNotifier {
     _pdfFileName = null;
     _videoFileName = null;
     _editingCourse = null;
+    for (var ch in _chapters) ch.dispose();
+    _chapters.clear();
+    addChapter(); // Reset to one empty chapter
     notifyListeners();
   }
 
@@ -259,6 +372,7 @@ class CourseFormViewModel extends ChangeNotifier {
     instructorController.dispose();
     durationController.dispose();
     priceController.dispose();
+    for (var ch in _chapters) ch.dispose();
     super.dispose();
   }
 }
@@ -272,3 +386,30 @@ final courseFormProvider = ChangeNotifierProvider.autoDispose<CourseFormViewMode
 final courseServiceProvider = Provider<CourseService>((ref) {
   return CourseService();
 });
+
+class ChapterFormState {
+  final TextEditingController titleController;
+  final TextEditingController descriptionController;
+  File? pdfFile;
+  String? pdfFileName;
+  String? pdfUrl;
+  File? videoFile;
+  String? videoFileName;
+  String? videoUrl;
+
+  ChapterFormState({
+    required String title,
+    required String description,
+    this.pdfUrl,
+    this.videoUrl,
+  }) : titleController = TextEditingController(text: title),
+       descriptionController = TextEditingController(text: description) {
+    if (pdfUrl != null) pdfFileName = pdfUrl!.split('/').last;
+    if (videoUrl != null) videoFileName = videoUrl!.split('/').last;
+  }
+
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+  }
+}

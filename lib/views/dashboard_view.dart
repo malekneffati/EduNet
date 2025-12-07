@@ -5,6 +5,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import '../components/home/navbar.dart';
 import '../components/home/footer.dart';
+import '../services/course_service.dart';
+import '../models/course_model.dart';
+import '../services/payment_service.dart';
+import 'dart:async';
+
 
 class DashboardView extends ConsumerStatefulWidget {
   const DashboardView({super.key});
@@ -20,12 +25,21 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   int _enrolledCourses = 0;
   int _completedCourses = 0;
   double _averageProgress = 0.0;
+  List<CourseModel> _myCourses = [];
+  List<CourseModel> _recommendedCourses = [];
+  StreamSubscription? _coursesSubscription;
 
   @override
   void initState() {
     super.initState();
     _checkUserRole();
-    _loadStudentStats();
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _coursesSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkUserRole() async {
@@ -60,23 +74,46 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
       }
     } catch (e) {
       print('Erreur: $e');
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _loadStudentStats() async {
+  Future<void> _loadData() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user != null) {
+      if (mounted) setState(() => _isLoading = true);
+      
+      try {
+        final courseService = CourseService();
+        final paymentService = PaymentService();
+        
+        // 1. Get IDs of enrolled courses
+        final enrolledIds = await paymentService.getEnrolledCourseIds(user.uid);
 
-    try {
-      // Simuler les données pour l'instant
-      setState(() {
-        _enrolledCourses = 3;
-        _completedCourses = 1;
-        _averageProgress = 45.0;
-      });
-    } catch (e) {
-      print('Erreur chargement stats: $e');
+        // 2. Cancel previous subscription if any
+        _coursesSubscription?.cancel();
+
+        // 3. Listen to courses and filter
+        _coursesSubscription = courseService.getCourses().listen((courses) {
+           if (mounted) {
+             setState(() {
+               if (courses.isNotEmpty) {
+                 _myCourses = courses.where((c) => enrolledIds.contains(c.id)).toList();
+                 _recommendedCourses = courses.where((c) => !enrolledIds.contains(c.id)).toList();
+                 
+                 _enrolledCourses = _myCourses.length;
+               } else {
+                  _myCourses = [];
+                  _recommendedCourses = [];
+               }
+               _isLoading = false;
+             });
+           }
+        });
+      } catch (e) {
+        print('Error loading courses: $e');
+         if (mounted) setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -92,14 +129,18 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     final isMobile = width < 768;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: _loadData,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
           children: [
             const Navbar(),
             _buildDashboardContent(context, isMobile),
             const Footer(),
           ],
         ),
+      ),
       ),
     );
   }
@@ -249,27 +290,16 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   }
 
   Widget _buildContinueLearning(bool isMobile) {
-    // Données simulées
-    final courses = [
-      {
-        'title': 'Développement Web Complet',
-        'instructor': 'Malek Neffati',
-        'progress': 65.0,
-        'image': 'assets/images/course1.jpg',
-        'category': 'Développement',
-      },
-      {
-        'title': 'Marketing Digital pour Débutants',
-        'instructor': 'Sarah Martin',
-        'progress': 30.0,
-        'image': 'assets/images/course2.jpg',
-        'category': 'Marketing',
-      },
-    ];
+    if (_myCourses.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text("Aucun cours inscrit pour le moment."),
+      );
+    }
 
     if (isMobile) {
       return Column(
-        children: courses.map((course) => _buildCourseCardVertical(course)).toList(),
+        children: _myCourses.map((course) => _buildCourseCardVertical(course)).toList(),
       );
     } else {
       return GridView.builder(
@@ -281,18 +311,18 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           mainAxisSpacing: 16,
           childAspectRatio: 1.5,
         ),
-        itemCount: courses.length,
-        itemBuilder: (context, index) => _buildCourseCard(courses[index]),
+        itemCount: _myCourses.length,
+        itemBuilder: (context, index) => _buildCourseCard(_myCourses[index]),
       );
     }
   }
 
-  Widget _buildCourseCard(Map<String, dynamic> course) {
+  Widget _buildCourseCard(CourseModel course) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => context.go('/catalog'),
+        onTap: () => context.push('/course/${course.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,7 +352,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      course['title'],
+                      course.title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -332,14 +362,14 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      course['instructor'],
+                      course.instructor,
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
                       ),
                     ),
                     const Spacer(),
-                    // Progress bar
+                    // Progress bar (Simulated)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -353,9 +383,9 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                                 color: Colors.grey[600],
                               ),
                             ),
-                            Text(
-                              '${course['progress'].toInt()}%',
-                              style: const TextStyle(
+                            const Text(
+                              '0%', // Waiting for real progress implementation
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF4F46E5),
@@ -364,10 +394,10 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: course['progress'] / 100,
-                          backgroundColor: Colors.grey[200],
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
+                        const LinearProgressIndicator(
+                          value: 0, 
+                          backgroundColor: Color(0xFFEEEEEE),
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
                         ),
                       ],
                     ),
@@ -381,13 +411,13 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     );
   }
 
-  Widget _buildCourseCardVertical(Map<String, dynamic> course) {
+  Widget _buildCourseCardVertical(CourseModel course) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => context.go('/catalog'),
+        onTap: () => context.push('/course/${course.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -415,7 +445,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      course['title'],
+                      course.title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -425,19 +455,19 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      course['instructor'],
+                      course.instructor,
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 8),
-                    LinearProgressIndicator(
-                      value: course['progress'] / 100,
-                      backgroundColor: Colors.grey[200],
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
+                    const LinearProgressIndicator(
+                      value: 0,
+                      backgroundColor: Color(0xFFEEEEEE),
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${course['progress'].toInt()}% complété',
-                      style: const TextStyle(
+                    const Text(
+                      '0% complété',
+                      style: TextStyle(
                         fontSize: 11,
                         color: Color(0xFF4F46E5),
                         fontWeight: FontWeight.bold,
@@ -454,28 +484,16 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
   }
 
   Widget _buildRecommendedCourses(bool isMobile) {
-    final recommended = [
-      {
-        'title': 'Python pour la Data Science',
-        'instructor': 'Dr. Ahmed Ben Ali',
-        'price': 150.0,
-        'rating': 4.8,
-        'students': 1234,
-        'category': 'Data Science',
-      },
-      {
-        'title': 'Design UI/UX avec Figma',
-        'instructor': 'Leila Mansouri',
-        'price': 120.0,
-        'rating': 4.9,
-        'students': 890,
-        'category': 'Design',
-      },
-    ];
+    if (_recommendedCourses.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Text("Plus de cours bientôt disponibles !"),
+      );
+    }
 
     if (isMobile) {
       return Column(
-        children: recommended.map((course) => _buildRecommendedCardMobile(course)).toList(),
+        children: _recommendedCourses.map((course) => _buildRecommendedCardMobile(course)).toList(),
       );
     } else {
       return GridView.builder(
@@ -487,18 +505,18 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
           mainAxisSpacing: 16,
           childAspectRatio: 1.3,
         ),
-        itemCount: recommended.length,
-        itemBuilder: (context, index) => _buildRecommendedCard(recommended[index]),
+        itemCount: _recommendedCourses.length,
+        itemBuilder: (context, index) => _buildRecommendedCard(_recommendedCourses[index]),
       );
     }
   }
 
-  Widget _buildRecommendedCard(Map<String, dynamic> course) {
+  Widget _buildRecommendedCard(CourseModel course) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => context.push('/catalog'),
+        onTap: () => context.push('/course/${course.id}'),
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,7 +539,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course['title'],
+                    course.title,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -531,7 +549,7 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    course['instructor'],
+                    course.instructor,
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 8),
@@ -539,20 +557,20 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                     children: [
                       const Icon(Icons.star, size: 14, color: Colors.amber),
                       const SizedBox(width: 4),
-                      Text(
-                        '${course['rating']}',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      const Text(
+                        '4.5', // Placeholder
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        '(${course['students']} étudiants)',
+                        '(${course.price} TND)',
                         style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${course['price'].toStringAsFixed(0)} TND',
+                    course.isFree ? 'Gratuit' : '${course.price} TND',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -568,13 +586,13 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
     );
   }
 
-  Widget _buildRecommendedCardMobile(Map<String, dynamic> course) {
+  Widget _buildRecommendedCardMobile(CourseModel course) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () => context.push('/catalog'),
+        onTap: () => context.push('/course/${course.id}'),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -596,22 +614,22 @@ class _DashboardViewState extends ConsumerState<DashboardView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      course['title'],
+                      course.title,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(Icons.star, size: 12, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text('${course['rating']}', style: const TextStyle(fontSize: 11)),
+                        Icon(Icons.star, size: 12, color: Colors.amber),
+                        SizedBox(width: 2),
+                        Text('4.5', style: TextStyle(fontSize: 11)),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${course['price'].toStringAsFixed(0)} TND',
+                      course.isFree ? 'Gratuit' : '${course.price} TND',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

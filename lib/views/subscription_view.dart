@@ -4,6 +4,9 @@ import '../components/home/navbar.dart';
 import '../components/home/footer.dart';
 import '../viewmodels/admin/promotion_management_viewmodel.dart';
 import '../models/promotion_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../services/payment_service.dart';
 
 class SubscriptionView extends ConsumerStatefulWidget {
   const SubscriptionView({super.key});
@@ -322,41 +325,94 @@ class _SubscriptionViewState extends ConsumerState<SubscriptionView> {
     return _buildSubscriptionPlans(fallbackPlans, isMobile);
   }
 
-  void _handleSubscribe(PromotionModel promo) {
+  Future<void> _handleSubscribe(PromotionModel promo) async {
     if (promo.price == 0) {
-      // Déjà gratuit
       return;
     }
 
-    // TODO: Implémenter le processus de paiement
-    showDialog(
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veuillez vous connecter pour vous abonner')),
+      );
+      // context.go('/login'); // Si vous avez cette route
+      return;
+    }
+
+    // Confirmation
+    final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Abonnement'),
         content: Text(
-          'Vous êtes sur le point de vous abonner à "${promo.title}" pour ${promo.price.toStringAsFixed(0)} TND/${promo.period == 'monthly' ? 'mois' : 'an'}.',
+          'Vous allez être redirigé vers Paymee pour payer ${promo.price} TND.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(ctx),
+            onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Fonctionnalité de paiement à implémenter',
-                  ),
-                  backgroundColor: Colors.orange,
-                ),
-              );
-            },
-            child: const Text('Confirmer'),
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4F46E5),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Payer maintenant'),
           ),
         ],
       ),
     );
+
+    if (confirm != true) return;
+
+    // Loading
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final paymentService = PaymentService();
+      final orderId = 'SUB_${promo.id}_${DateTime.now().millisecondsSinceEpoch}';
+      
+      final paymentUrl = await paymentService.initBackendPayment(
+        amount: promo.price,
+        orderId: orderId,
+        email: user.email ?? 'etudiant@edunet.com',
+        firstName: user.displayName?.split(' ').first,
+        lastName: user.displayName?.split(' ').last,
+      );
+
+      // Fermer le loading
+      if (mounted) Navigator.pop(context);
+
+      if (paymentUrl != null) {
+        final uri = Uri.parse(paymentUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+             if (mounted) {
+               ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Impossible d\'ouvrir le lien de paiement')),
+              );
+             }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Erreur lors de l\'initialisation du paiement'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context); // Close loading if error
+      print('Erreur paiement: $e');
+    }
   }
 }

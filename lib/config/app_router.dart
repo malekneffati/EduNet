@@ -11,8 +11,8 @@ import '../views/admin_payments_view.dart';
 import '../views/admin_promotions_view.dart';
 import '../views/course_management_view.dart';
 import '../views/course_form_view.dart';
-import '../views/course_detail_view.dart';
-import '../models/course_model.dart';
+import '../views/course_details_view.dart';
+import '../views/video_player_view.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -46,8 +46,8 @@ class AppRouter {
       GoRoute(
         path: '/course/:id',
         builder: (context, state) {
-          final course = state.extra as CourseModel;
-          return CourseDetailView(course: course);
+          final courseId = state.pathParameters['id']!;
+          return CourseDetailsView(courseId: courseId);
         },
       ),
 
@@ -82,6 +82,13 @@ class AppRouter {
       GoRoute(
         path: '/admin/promotions',
         builder: (context, state) => const AdminPromotionsView(),
+      ),
+      GoRoute(
+        path: '/player',
+        builder: (context, state) {
+          final videoUrl = state.extra as String;
+          return VideoPlayerView(videoUrl: videoUrl);
+        },
       ),
     ],
     errorBuilder: (context, state) => const HomeView(),

@@ -93,6 +93,7 @@ class ChapterModel {
   final String description;
   final String? pdfUrl;
   final String? videoUrl;
+  final QuizModel? quiz;
 
   ChapterModel({
     required this.id,
@@ -100,6 +101,7 @@ class ChapterModel {
     required this.description,
     this.pdfUrl,
     this.videoUrl,
+    this.quiz,
   });
 
   factory ChapterModel.fromMap(Map<String, dynamic> map) {
@@ -109,6 +111,7 @@ class ChapterModel {
       description: map['description'] ?? '',
       pdfUrl: map['pdfUrl'],
       videoUrl: map['videoUrl'],
+      quiz: map['quiz'] != null ? QuizModel.fromMap(map['quiz']) : null,
     );
   }
 
@@ -119,6 +122,71 @@ class ChapterModel {
       'description': description,
       'pdfUrl': pdfUrl,
       'videoUrl': videoUrl,
+      'quiz': quiz?.toMap(),
+    };
+  }
+}
+
+class QuizModel {
+  final int passingScore;
+  final List<QuestionModel> questions;
+
+  QuizModel({
+    required this.passingScore,
+    required this.questions,
+  });
+
+  factory QuizModel.fromMap(Map<String, dynamic> map) {
+    return QuizModel(
+      passingScore: map['passingScore'] ?? 60,
+      questions: map['questions'] != null
+          ? (map['questions'] as List)
+              .map((q) => QuestionModel.fromMap(q))
+              .toList()
+          : [],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'passingScore': passingScore,
+      'questions': questions.map((q) => q.toMap()).toList(),
+    };
+  }
+}
+
+class QuestionModel {
+  final String id;
+  final String question;
+  final List<String> options;
+  final int correctAnswer;
+  final String? explanation;
+
+  QuestionModel({
+    required this.id,
+    required this.question,
+    required this.options,
+    required this.correctAnswer,
+    this.explanation,
+  });
+
+  factory QuestionModel.fromMap(Map<String, dynamic> map) {
+    return QuestionModel(
+      id: map['id'] ?? '',
+      question: map['question'] ?? '',
+      options: List<String>.from(map['options'] ?? []),
+      correctAnswer: map['correctAnswer'] ?? 0,
+      explanation: map['explanation'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'question': question,
+      'options': options,
+      'correctAnswer': correctAnswer,
+      'explanation': explanation,
     };
   }
 }

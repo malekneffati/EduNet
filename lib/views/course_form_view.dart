@@ -436,6 +436,164 @@ class _CourseFormViewState extends ConsumerState<CourseFormView> {
 
                                 const SizedBox(height: 32),
 
+                                const SizedBox(height: 32),
+                                // Chapters Section
+                                const Text(
+                                  'Chapitres du cours',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+
+                                ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: viewModel.chapters.length,
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 16),
+                                  itemBuilder: (context, index) {
+                                    final chapter = viewModel.chapters[index];
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey[300]!),
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: Colors.grey[50], // Fond léger comme image
+                                      ),
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Chapitre ${index + 1}',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                              TextButton(
+                                                onPressed: () => viewModel.removeChapter(index),
+                                                child: const Text(
+                                                  'Supprimer',
+                                                  style: TextStyle(color: Colors.red),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                          TextFormField(
+                                            controller: chapter.titleController,
+                                            decoration: const InputDecoration(
+                                              hintText: 'Titre du chapitre (ex: Introduction au Web)',
+                                              border: OutlineInputBorder(),
+                                              filled: true,
+                                              fillColor: Colors.white,
+                                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                            ),
+                                            validator: (val) => val == null || val.isEmpty ? 'Requis' : null,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          TextFormField(
+                                            controller: chapter.descriptionController,
+                                            maxLines: 3,
+                                            decoration: const InputDecoration(
+                                              hintText: 'Description du chapitre...',
+                                              border: OutlineInputBorder(),
+                                              filled: true,
+                                              fillColor: Colors.white,
+                                            ),
+                                            validator: (val) => val == null || val.isEmpty ? 'Requis' : null,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          
+                                          // Video / PDF per chapter
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: OutlinedButton.icon(
+                                                  icon: const Icon(Icons.videocam_outlined),
+                                                  label: Text(
+                                                     chapter.videoFileName ?? 'Upload Vidéo',
+                                                     overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                  onPressed: () => viewModel.pickChapterVideo(index),
+                                                  style: OutlinedButton.styleFrom(
+                                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                                    backgroundColor: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                           Row(
+                                            children: [
+                                              Expanded(
+                                                child: OutlinedButton.icon(
+                                                  icon: const Icon(Icons.picture_as_pdf_outlined),
+                                                  label: Text(
+                                                     chapter.pdfFileName ?? 'Upload PDF',
+                                                      overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                  onPressed: () => viewModel.pickChapterPDF(index),
+                                                  style: OutlinedButton.styleFrom(
+                                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                                    backgroundColor: Colors.white,
+                                                   ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                           // View Links helpers (optional, based on image showing "Voir le PDF")
+                                          if (chapter.pdfUrl != null)
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 4.0),
+                                              child: Text('PDF actuel: ${chapter.pdfFileName}', style: const TextStyle(fontSize: 12, color: Colors.blue)),
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+
+                                const SizedBox(height: 16),
+
+                                // Add Buttons
+                                Row(
+                                    children: [
+                                        ElevatedButton.icon(
+                                          onPressed: viewModel.addChapter,
+                                          icon: const Icon(Icons.add),
+                                          label: const Text('Ajouter un chapitre'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF2563EB), // Blue 600
+                                            foregroundColor: Colors.white,
+                                          ),
+                                        ),
+                                    ],
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                    children: [
+                                        ElevatedButton.icon(
+                                          onPressed: () {}, // TODO: Quiz implementation
+                                          icon: const Icon(Icons.quiz),
+                                          label: const Text('Ajouter un quiz'),
+                                           style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF2563EB), 
+                                            foregroundColor: Colors.white,
+                                          ),
+                                        ),
+                                    ],
+                                ),
+
+                                const SizedBox(height: 32),
+
                                 // Upload Progress
                                 if (viewModel.isUploading) ...[
                                   LinearProgressIndicator(
