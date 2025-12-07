@@ -2,6 +2,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useCourseContentViewModel from "../viewmodels/courses/CourseContentViewModel";
+import QuizCard from "../components/student/QuizCard";
 
 const Star = ({ filled, onClick }) => (
   <span
@@ -94,6 +95,9 @@ const CourseContent = () => {
                   📄 Télécharger le document PDF
                 </a>
               )}
+
+              {/* Quiz Card */}
+              <QuizCard courseId={id} chapter={chapter} />
             </div>
           ))
         )}

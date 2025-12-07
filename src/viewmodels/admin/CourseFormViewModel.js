@@ -37,8 +37,10 @@ const useCourseFormViewModel = (initialData, onSave, onCancel) => {
       {
         id: uuidv4(),
         title: "",
+        description: "",
         videoUrl: "",
         pdfUrl: "",
+        quiz: null,
       },
     ]);
   };
@@ -48,10 +50,155 @@ const useCourseFormViewModel = (initialData, onSave, onCancel) => {
     setChapters(chapters.filter((c) => c.id !== id));
   };
 
-  // Mettre à jour un champ d’un chapitre
+  // Mettre à jour un champ d'un chapitre
   const updateChapter = (id, field, value) => {
     setChapters(
       chapters.map((c) => (c.id === id ? { ...c, [field]: value } : c))
+    );
+  };
+
+  // Ajouter un quiz à un chapitre
+  const addQuizToChapter = (chapterId) => {
+    setChapters(
+      chapters.map((c) =>
+        c.id === chapterId
+          ? {
+              ...c,
+              quiz: {
+                questions: [
+                  {
+                    id: uuidv4(),
+                    question: "",
+                    options: ["", "", "", ""],
+                    correctAnswer: 0,
+                    explanation: "",
+                  },
+                ],
+                passingScore: 60,
+              },
+            }
+          : c
+      )
+    );
+  };
+
+  // Supprimer le quiz d'un chapitre
+  const removeQuizFromChapter = (chapterId) => {
+    setChapters(
+      chapters.map((c) => (c.id === chapterId ? { ...c, quiz: null } : c))
+    );
+  };
+
+  // Ajouter une question au quiz
+  const addQuestionToQuiz = (chapterId) => {
+    setChapters(
+      chapters.map((c) => {
+        if (c.id === chapterId && c.quiz) {
+          return {
+            ...c,
+            quiz: {
+              ...c.quiz,
+              questions: [
+                ...c.quiz.questions,
+                {
+                  id: uuidv4(),
+                  question: "",
+                  options: ["", "", "", ""],
+                  correctAnswer: 0,
+                  explanation: "",
+                },
+              ],
+            },
+          };
+        }
+        return c;
+      })
+    );
+  };
+
+  // Supprimer une question du quiz
+  const removeQuestionFromQuiz = (chapterId, questionId) => {
+    setChapters(
+      chapters.map((c) => {
+        if (c.id === chapterId && c.quiz) {
+          return {
+            ...c,
+            quiz: {
+              ...c.quiz,
+              questions: c.quiz.questions.filter((q) => q.id !== questionId),
+            },
+          };
+        }
+        return c;
+      })
+    );
+  };
+
+  // Mettre à jour une question du quiz
+  const updateQuizQuestion = (chapterId, questionId, field, value) => {
+    setChapters(
+      chapters.map((c) => {
+        if (c.id === chapterId && c.quiz) {
+          return {
+            ...c,
+            quiz: {
+              ...c.quiz,
+              questions: c.quiz.questions.map((q) =>
+                q.id === questionId ? { ...q, [field]: value } : q
+              ),
+            },
+          };
+        }
+        return c;
+      })
+    );
+  };
+
+  // Mettre à jour une option de question
+  const updateQuizQuestionOption = (
+    chapterId,
+    questionId,
+    optionIndex,
+    value
+  ) => {
+    setChapters(
+      chapters.map((c) => {
+        if (c.id === chapterId && c.quiz) {
+          return {
+            ...c,
+            quiz: {
+              ...c.quiz,
+              questions: c.quiz.questions.map((q) => {
+                if (q.id === questionId) {
+                  const newOptions = [...q.options];
+                  newOptions[optionIndex] = value;
+                  return { ...q, options: newOptions };
+                }
+                return q;
+              }),
+            },
+          };
+        }
+        return c;
+      })
+    );
+  };
+
+  // Mettre à jour le score de passage
+  const updateQuizPassingScore = (chapterId, score) => {
+    setChapters(
+      chapters.map((c) => {
+        if (c.id === chapterId && c.quiz) {
+          return {
+            ...c,
+            quiz: {
+              ...c.quiz,
+              passingScore: Number(score),
+            },
+          };
+        }
+        return c;
+      })
     );
   };
 
@@ -110,6 +257,15 @@ const useCourseFormViewModel = (initialData, onSave, onCancel) => {
     addChapter,
     updateChapter,
     removeChapter,
+
+    // Fonctions pour les quiz
+    addQuizToChapter,
+    removeQuizFromChapter,
+    addQuestionToQuiz,
+    removeQuestionFromQuiz,
+    updateQuizQuestion,
+    updateQuizQuestionOption,
+    updateQuizPassingScore,
   };
 };
 

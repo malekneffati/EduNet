@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/home/Navbar";
 import Footer from "./components/home/Footer";
-import PrivateRoute from "./components/auth/PrivateRoute";
+import PrivateRoute from "./components/auth/privateRoute";
 import Home from "./views/Home";
 import Login from "./views/Login";
 import Dashboard from "./views/Dashboard";
@@ -12,6 +12,7 @@ import CourseDetails from "./views/CourseDetails";
 import CourseContent from "./views/CourseContent";
 import ProtectedCourse from "./views/ProtectedCourse";
 import SubscriptionsPage from "./views/SubscriptionsPage";
+import Quiz from "./views/Quiz";
 
 function App() {
   const [role, setRole] = React.useState(localStorage.getItem("role") || null);
@@ -51,6 +52,14 @@ function App() {
             element={
               <ProtectedCourse>
                 <CourseContent />
+              </ProtectedCourse>
+            }
+          />
+          <Route
+            path="/course/:id/chapter/:chapterId/quiz"
+            element={
+              <ProtectedCourse>
+                <Quiz />
               </ProtectedCourse>
             }
           />
