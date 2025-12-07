@@ -2,7 +2,8 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import useCourseDetailsViewModel from "../viewmodels/courses/CourseDetailsViewModel";
-import PaymentViewModel from "../viewmodels/courses/PaymentViewModel";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -15,6 +16,9 @@ const CourseDetails = () => {
     handlePayment,
     canAccessCourse,
   } = useCourseDetailsViewModel(id);
+
+  const navigate = useNavigate();
+  const user = auth.currentUser;
 
   if (loading) return <p className="p-8 text-center">Chargement...</p>;
   if (course === "not_found") return <p>Cours introuvable.</p>;

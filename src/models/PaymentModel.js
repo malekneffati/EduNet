@@ -1,42 +1,28 @@
 // src/models/PaymentModel.js
 class PaymentModel {
   constructor() {
-    // URL de ton backend Render
-    this.FUNCTION_URL = "https://edunet-5n83.onrender.com/createPayment";
+    // URL du backend Render
+    this.FUNCTION_URL = "https://edunet-1bqg.onrender.com/createPayment";
   }
 
-  /**
-   * Crée un paiement via Render -> Paymee
-   * @param {number} amount
-   * @param {string} note
-   * @param {string} returnUrl
-   * @param {string} cancelUrl
-   * @param {object} user {firstName, lastName, email, phone, name}
-   * @returns {Promise<{token, payment_url}>}
-   */
   async createPayment(amount, note, returnUrl, cancelUrl, user) {
     if (!amount || isNaN(amount)) throw new Error("Montant invalide");
 
-    let firstName = user.firstName;
-    let lastName = user.lastName;
-    if (!firstName || !lastName) {
-      const parts = (user.name || "User Unknown").split(" ");
-      firstName = parts[0] || "User";
-      lastName = parts.slice(1).join(" ") || "Unknown";
-    }
+    // Paymee veut amount en millimes → 10 TND = 10000
+    const finalAmount = Number(amount) * 1000;
 
     const body = {
-      amount: Number(amount),
+      amount: finalAmount,
       note,
-      firstName,
-      lastName,
+      firstName: user.firstName || "User",
+      lastName: user.lastName || "Unknown",
       email: user.email || "user@example.com",
       phone: user.phone || "+21600000000",
-      returnUrl,
-      cancelUrl,
+      returnUrl: returnUrl,
+      cancelUrl: cancelUrl,
     };
 
-    console.log("Création paiement via Render backend:", body);
+    console.log("Payload envoyé au backend Render:", body);
 
     const response = await fetch(this.FUNCTION_URL, {
       method: "POST",
@@ -47,14 +33,13 @@ class PaymentModel {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Erreur paiement :", data);
+      console.error("Erreur Paymee:", data);
       throw new Error(data.message || "Erreur paiement");
     }
 
     if (!data.token || !data.payment_url) {
-      throw new Error(
-        "Réponse Paymee invalide : token ou payment_url manquant"
-      );
+      console.error("Réponse backend incorrecte:", data);
+      throw new Error("Réponse Paymee invalide : token/payment_url manquant");
     }
 
     return data; // { token, payment_url }
@@ -62,4 +47,3 @@ class PaymentModel {
 }
 
 export default new PaymentModel();
-

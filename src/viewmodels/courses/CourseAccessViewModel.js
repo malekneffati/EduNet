@@ -3,25 +3,14 @@ import { db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 class CourseAccessViewModel {
-  /**
-   * Vérifie si un utilisateur a accès à un cours
-   * @param {string} userId
-   * @param {string} courseId
-   * @returns {boolean}
-   */
   async userHasAccess(userId, courseId) {
-    if (!userId) return false;
+    if (!userId || !courseId) return false;
 
-    const userSnap = await getDoc(doc(db, "users", userId));
-    if (!userSnap.exists()) return false;
+    // Vérifie dans la sous-collection myCourses
+    const courseRef = doc(db, "users", userId, "myCourses", courseId);
+    const courseSnap = await getDoc(courseRef);
 
-    const data = userSnap.data();
-
-    // Vérifie si le cours est payé ou rejoint gratuitement
-    return (
-      data.coursesBought?.includes(courseId) ||
-      data.myCourses?.[courseId] != null
-    );
+    return courseSnap.exists(); // l’utilisateur possède le cours
   }
 }
 

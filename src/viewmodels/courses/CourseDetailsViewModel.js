@@ -11,8 +11,8 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
-import PaymentModel from "../../models/PaymentModel";
 import CourseAccessViewModel from "./CourseAccessViewModel";
+import PaymentViewModel from "../../viewmodels/courses/PaymentViewModel";
 
 export default function useCourseDetailsViewModel(courseId) {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function useCourseDetailsViewModel(courseId) {
   const [canAccessCourse, setCanAccessCourse] = useState(false);
 
   const user = auth.currentUser;
-  const userId = user ? user.uid : null;
+  const userId = user?.uid;
 
   // Vérifier l'accès au cours
   useEffect(() => {
@@ -74,7 +74,9 @@ export default function useCourseDetailsViewModel(courseId) {
 
   const averageRating =
     reviews.length > 0
-      ? (reviews.reduce((a, b) => a + b.rating, 0) / reviews.length).toFixed(1)
+      ? (
+          reviews.reduce((a, b) => a + (b.rating || 0), 0) / reviews.length
+        ).toFixed(1)
       : 0;
 
   // Rejoindre cours gratuit
@@ -97,44 +99,21 @@ export default function useCourseDetailsViewModel(courseId) {
     }
   };
 
-  // Paiement Paymee
+  // Paiement via PaymentViewModel
   const handlePayment = async () => {
-    if (!auth.currentUser) {
+    if (!userId) {
       alert("Vous devez être connecté.");
       return;
     }
-
     try {
-      const response = await fetch(
-        "https://sandbox.paymee.tn/api/v2/payments/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${process.env.REACT_APP_PAYMEE_API_KEY}`,
-          },
-          body: JSON.stringify({
-            amount: course.price,
-            note: `Achat du cours : ${course.title}`,
-            first_name: auth.currentUser.displayName || "User",
-            last_name: "",
-            email: auth.currentUser.email,
-            return_url: `${window.location.origin}/payment-success?courseId=${courseId}`,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!data.data || !data.data.payment_url) {
-        alert("Erreur Paymee");
-        return;
+      const paymentData = await PaymentViewModel.startPayment(course, userId);
+      if (paymentData?.payment_url) {
+        window.location.href = paymentData.payment_url;
+      } else {
+        alert("Erreur lors de la création du paiement.");
       }
-
-      // Redirect Paymee payment page
-      window.location.href = data.data.payment_url;
     } catch (err) {
-      console.error(err);
+      console.error("Erreur paiement :", err);
       alert("Erreur lors du paiement.");
     }
   };
