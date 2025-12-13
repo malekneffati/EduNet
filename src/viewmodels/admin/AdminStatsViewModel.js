@@ -4,7 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 export default class AdminStatsViewModel {
   static async getStats() {
     try {
-      const snap = await getDocs(collection(db, "paiments"));
+      const snap = await getDocs(collection(db, "paiements"));
 
       let monthlyRevenue = {};
       let courseSales = {};

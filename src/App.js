@@ -10,7 +10,6 @@ import AdminDashboard from "./views/AdminDashboard";
 import Catalog from "./views/Catalog";
 import CourseDetails from "./views/CourseDetails";
 import CourseContent from "./views/CourseContent";
-import ProtectedCourse from "./views/ProtectedCourse";
 import SubscriptionsPage from "./views/SubscriptionsPage";
 
 function App() {
@@ -46,14 +45,7 @@ function App() {
             }
           />
           <Route path="/course/:id/details" element={<CourseDetails />} />
-          <Route
-            path="/course/:id/content"
-            element={
-              <ProtectedCourse>
-                <CourseContent />
-              </ProtectedCourse>
-            }
-          />
+          <Route path="/course/:id/content" element={<CourseContent />} />
           <Route path="/Subscription" element={<SubscriptionsPage />} />
         </Routes>
       </main>

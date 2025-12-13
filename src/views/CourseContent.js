@@ -1,3 +1,4 @@
+//src/views/CourseContent.js
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import useCourseContentViewModel from "../viewmodels/courses/CourseContentViewModel";
@@ -27,66 +28,14 @@ const CourseContent = () => {
     loading,
     allowed,
     chapters,
-    reviews,
     newRating,
     setNewRating,
     newComment,
     setNewComment,
     sendingReview,
     submitReview,
-    averageRating,
   } = vm;
 
-  // ------------------------------
-  // 1️⃣ Gestion du paiement Paymee
-  // ------------------------------
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const paymentToken = params.get("payment_token");
-    const transactionId = params.get("transaction");
-    const status = params.get("status");
-    const userId = params.get("userId");
-
-    if (
-      status === "success" &&
-      paymentToken &&
-      transactionId &&
-      userId &&
-      !paymentChecked
-    ) {
-      setPaymentChecked(true);
-
-      const saveTransaction = async () => {
-        try {
-          await setDoc(doc(db, "purchases", transactionId), {
-            userId,
-            courseId: id,
-            paymentToken,
-            transactionId,
-            status,
-            createdAt: Timestamp.now(),
-          });
-
-          console.log("✅ Paiement enregistré et accès débloqué");
-
-          // Nettoyer l'URL pour éviter la double exécution si reload
-          window.history.replaceState(
-            {},
-            document.title,
-            `/course/${id}/content`
-          );
-        } catch (err) {
-          console.error("❌ Erreur enregistrement paiement :", err);
-        }
-      };
-
-      saveTransaction();
-    }
-  }, [location.search, id, paymentChecked]);
-
-  // ------------------------------
-  // 2️⃣ Gestion affichage du cours
-  // ------------------------------
   if (loading) return <p className="p-8 text-center">Chargement...</p>;
   if (course === "not_found")
     return <p className="text-center p-8">Cours introuvable.</p>;
@@ -106,9 +55,7 @@ const CourseContent = () => {
       </div>
     );
 
-  // ------------------------------
-  // 3️⃣ Rendu du contenu
-  // ------------------------------
+  // Rendu du contenu
   return (
     <div className="max-w-4xl mx-auto p-8">
       <h1 className="text-2xl font-bold mb-4">{course.title}</h1>

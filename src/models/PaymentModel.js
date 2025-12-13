@@ -1,7 +1,6 @@
-// src/models/PaymentModel.js (appel le backend paiement)
+// src/models/PaymentModel.js
 class PaymentModel {
   constructor() {
-    // Backend Render
     this.FUNCTION_URL = "https://edunet-1bqg.onrender.com/createPayment";
   }
 
@@ -29,8 +28,6 @@ class PaymentModel {
       phone,
       returnUrl,
       cancelUrl,
-
-      // 🔑 clé indispensable pour le webhook
       orderId,
     };
 
@@ -53,7 +50,7 @@ class PaymentModel {
       throw new Error("Réponse Paymee invalide");
     }
 
-    return data; // { token, payment_url }
+    return data; 
   }
 }
 

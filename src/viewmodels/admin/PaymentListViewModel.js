@@ -12,7 +12,7 @@ class PaymentListViewModel {
     this.error = null;
 
     try {
-      const q = query(collection(db, "payments"), orderBy("date", "desc"));
+      const q = query(collection(db, "paiements"), orderBy("date", "desc"));
       const snapshot = await getDocs(q);
       this.payments = snapshot.docs.map((doc) => ({
         id: doc.id,

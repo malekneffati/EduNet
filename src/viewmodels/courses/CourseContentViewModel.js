@@ -1,3 +1,4 @@
+//src/viewmodels/courses/CourseContentViewModel.js
 import { useEffect, useState } from "react";
 import {
   doc,
@@ -6,21 +7,17 @@ import {
   getDocs,
   addDoc,
   Timestamp,
-  query,
-  where,
 } from "firebase/firestore";
 import { db, auth } from "../../firebase";
 
 const useCourseContentViewModel = (courseId) => {
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
-  const [allowed, setAllowed] = useState(false);
+  const [allowed, setAllowed] = useState(null); // null = pas encore vérifié
   const [loading, setLoading] = useState(true);
-
   // Reviews
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
-
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState("");
   const [sendingReview, setSendingReview] = useState(false);
@@ -43,7 +40,6 @@ const useCourseContentViewModel = (courseId) => {
       const data = { id: snap.id, ...snap.data() };
       setCourse(data);
 
-      // Directly load chapters from the array field
       if (data.chapters && Array.isArray(data.chapters)) {
         const sortedChapters = data.chapters
           .map((c) => ({ ...c }))
@@ -68,19 +64,10 @@ const useCourseContentViewModel = (courseId) => {
     }
 
     if (course?.isFree) {
+      console.log("Course is free, access granted");
       setAllowed(true);
       return;
     }
-
-    const q = query(
-      collection(db, "purchases"),
-      where("courseId", "==", courseId),
-      where("userId", "==", user.uid),
-      where("status", "==", "success")
-    );
-
-    const snap = await getDocs(q);
-    setAllowed(!snap.empty);
   };
 
   // ------------------------------

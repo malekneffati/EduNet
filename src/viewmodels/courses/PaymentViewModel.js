@@ -12,7 +12,6 @@ class PaymentViewModel {
     this.error = null;
 
     try {
-      // Récupérer les infos utilisateur depuis Firestore
       const userSnap = await getDoc(doc(db, "users", userId));
       if (!userSnap.exists()) throw new Error("Utilisateur introuvable");
 
@@ -27,10 +26,8 @@ class PaymentViewModel {
       const returnUrl = `https://edunet-1574d.web.app/course/${course.id}/content`;
       const cancelUrl = "https://edunet-1574d.web.app/course/payment-cancel";
 
-      // 🔑 identifiant de commande pour le webhook
       const orderId = `${userId}_${course.id}`;
 
-      // Appeler le backend Render
       const paymentData = await PaymentModel.createPayment({
         amount: course.price,
         note: `Achat du cours : ${course.title}`,

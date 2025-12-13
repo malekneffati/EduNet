@@ -1,5 +1,5 @@
 // EduNet/backend/index.js
-import { db } from "./firebaseAdmin.js"; // Firebase Admin
+import { db } from "./firebaseAdmin.js"; 
 import { sendConfirmationEmail } from "./emailService.js";
 import express from "express";
 import fetch from "node-fetch";
@@ -9,10 +9,7 @@ const BASE_URL = "https://sandbox.paymee.tn/api/v2";
 
 const app = express();
 app.use(cors());
-// 🔑 OBLIGATOIRE pour Paymee webhook
 app.use(express.urlencoded({ extended: true }));
-
-// Pour les autres routes JSON
 app.use(express.json());
 
 app.post("/createPayment", async (req, res) => {
@@ -66,26 +63,17 @@ app.post("/createPayment", async (req, res) => {
   }
 });
 
-// Endpoint webhook Paymee
 app.post("/paymee/webhook", async (req, res) => {
   try {
     const payload = req.body;
 
     console.log("📩 Webhook Paymee reçu :", payload);
 
-    /**
-     * 1️⃣ Vérifier que le payload existe
-     * Paymee envoie toujours payment_status (true / false)
-     */
     if (!payload || typeof payload.payment_status === "undefined") {
       console.log("❌ Webhook invalide (payload vide)");
       return res.status(200).send("OK");
     }
 
-    /**
-     * 2️⃣ Normaliser le statut de paiement Paymee
-     * Paymee Sandbox envoie "True" / "False" (string)
-     */
     const paymentSuccess =
       payload.payment_status === true ||
       payload.payment_status === "True" ||
@@ -98,10 +86,6 @@ app.post("/paymee/webhook", async (req, res) => {
       return res.status(200).send("OK");
     }
 
-    /**
-     * 3️⃣ Extraire userId et courseId depuis order_id
-     * Format attendu : userId_courseId
-     */
     const orderId = payload.order_id;
     if (!orderId || !orderId.includes("_")) {
       console.error("❌ order_id invalide :", orderId);
@@ -110,10 +94,6 @@ app.post("/paymee/webhook", async (req, res) => {
 
     const [userId, courseId] = orderId.split("_");
 
-    /**
-     * 4️⃣ Récupérer email et titre du cours
-     * note = "Achat du cours : XXX"
-     */
     const email = payload.email;
     const courseTitle = payload.note || "Cours EduNet";
 
@@ -122,9 +102,6 @@ app.post("/paymee/webhook", async (req, res) => {
       return res.status(200).send("OK");
     }
 
-    /**
-     * 5️⃣ Écrire dans Firestore (myCourses)
-     */
     const courseRef = db.doc(`users/${userId}/myCourses/${courseId}`);
     await courseRef.set({
       joinedAt: new Date(),
@@ -136,15 +113,9 @@ app.post("/paymee/webhook", async (req, res) => {
 
     console.log(`✅ Accès créé : user=${userId}, course=${courseId}`);
 
-    /**
-     * 6️⃣ Envoyer l’email de confirmation
-     */
     await sendConfirmationEmail(email, courseTitle);
     console.log(`📧 Email envoyé à ${email}`);
 
-    /**
-     * 7️⃣ Toujours répondre 200 à Paymee
-     */
     return res.status(200).send("OK");
   } catch (err) {
     console.error("🔥 Erreur webhook Paymee :", err);

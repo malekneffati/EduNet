@@ -12,7 +12,6 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
-import CourseAccessViewModel from "./CourseAccessViewModel";
 
 export default function useCourseDetailsViewModel(courseId) {
   const navigate = useNavigate();
@@ -23,19 +22,6 @@ export default function useCourseDetailsViewModel(courseId) {
 
   const user = auth.currentUser;
   const userId = user ? user.uid : null;
-
-  // Vérifier l'accès au cours
-  useEffect(() => {
-    const fetchUserAccess = async () => {
-      if (!userId) return;
-      const hasAccess = await CourseAccessViewModel.userHasAccess(
-        userId,
-        courseId
-      );
-      setCanAccessCourse(hasAccess);
-    };
-    fetchUserAccess();
-  }, [userId, courseId]);
 
   // Charger le cours
   useEffect(() => {
@@ -77,7 +63,6 @@ export default function useCourseDetailsViewModel(courseId) {
       ? (reviews.reduce((a, b) => a + b.rating, 0) / reviews.length).toFixed(1)
       : 0;
 
-  // Rejoindre cours gratuit
   const joinCourse = async () => {
     if (!userId) {
       alert("Veuillez vous connecter pour rejoindre ce cours.");
@@ -97,7 +82,6 @@ export default function useCourseDetailsViewModel(courseId) {
     }
   };
 
-  // Paiement via backend Render
   const handlePayment = async () => {
     if (!user) {
       alert("Vous devez être connecté.");
@@ -112,11 +96,8 @@ export default function useCourseDetailsViewModel(courseId) {
         lastName: user.lastName || "Unknown",
         email: user.email,
         phone: user.phone || "+21600000000",
-
         returnUrl: `https://edunet-1574d.web.app/course/${course.id}/content`,
         cancelUrl: `https://edunet-1574d.web.app/courses`,
-
-        // 🔑 information clé pour le webhook
         orderId: `${userId}_${course.id}`,
       };
 
@@ -135,8 +116,6 @@ export default function useCourseDetailsViewModel(courseId) {
         alert("Erreur lors de la création du paiement.");
         return;
       }
-
-      // ❌ AUCUNE écriture Firestore ici
 
       window.location.href = data.payment_url;
     } catch (err) {
