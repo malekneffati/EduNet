@@ -1,19 +1,23 @@
-// src/models/PaymentModel.js
+// src/models/PaymentModel.js (appel le backend paiement)
 class PaymentModel {
   constructor() {
-    // URL de ton backend Render
+    // Backend Render
     this.FUNCTION_URL = "https://edunet-1bqg.onrender.com/createPayment";
   }
 
-  async createPayment(amount, note, returnUrl, cancelUrl, user) {
-    if (!amount || isNaN(amount)) throw new Error("Montant invalide");
-
-    let firstName = user.firstName;
-    let lastName = user.lastName;
-    if (!firstName || !lastName) {
-      const parts = (user.name || "User Unknown").split(" ");
-      firstName = parts[0] || "User";
-      lastName = parts.slice(1).join(" ") || "Unknown";
+  async createPayment({
+    amount,
+    note,
+    returnUrl,
+    cancelUrl,
+    firstName,
+    lastName,
+    email,
+    phone,
+    orderId,
+  }) {
+    if (!amount || isNaN(amount)) {
+      throw new Error("Montant invalide");
     }
 
     const body = {
@@ -21,13 +25,16 @@ class PaymentModel {
       note,
       firstName,
       lastName,
-      email: user.email || "user@example.com",
-      phone: user.phone || "+21600000000",
+      email,
+      phone,
       returnUrl,
       cancelUrl,
+
+      // 🔑 clé indispensable pour le webhook
+      orderId,
     };
 
-    console.log("Création paiement via Render backend:", body);
+    console.log("Création paiement via Render backend :", body);
 
     const response = await fetch(this.FUNCTION_URL, {
       method: "POST",
@@ -42,10 +49,8 @@ class PaymentModel {
       throw new Error(data.message || "Erreur paiement");
     }
 
-    if (!data.token || !data.payment_url) {
-      throw new Error(
-        "Réponse Paymee invalide : token ou payment_url manquant"
-      );
+    if (!data.payment_url) {
+      throw new Error("Réponse Paymee invalide");
     }
 
     return data; // { token, payment_url }
@@ -53,4 +58,3 @@ class PaymentModel {
 }
 
 export default new PaymentModel();
-

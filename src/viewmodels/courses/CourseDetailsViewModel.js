@@ -116,9 +116,14 @@ export default function useCourseDetailsViewModel(courseId) {
         returnUrl: `https://edunet-1574d.web.app/course/${course.id}/content`,
         cancelUrl: `https://edunet-1574d.web.app/courses`,
 
+        // 🔑 information clé pour le webhook
+        orderId: `${userId}_${course.id}`,
+
         metadata: {
-          userId,
+          userId: userId,
           courseId: course.id,
+          courseTitle: course.title,
+          email: user.email,
         },
       };
 
@@ -138,12 +143,7 @@ export default function useCourseDetailsViewModel(courseId) {
         return;
       }
 
-      await setDoc(doc(db, "users", userId, "myCourses", course.id), {
-        joinedAt: Timestamp.now(),
-        progress: 0,
-      });
-
-      console.log("✅ Transaction enregistrée côté frontend");
+      // ❌ AUCUNE écriture Firestore ici
 
       window.location.href = data.payment_url;
     } catch (err) {
@@ -151,7 +151,6 @@ export default function useCourseDetailsViewModel(courseId) {
       alert("Erreur lors du paiement. Veuillez réessayer plus tard.");
     }
   };
-
 
   return {
     course,

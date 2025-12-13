@@ -18,31 +18,31 @@ class PaymentViewModel {
 
       const user = userSnap.data();
 
-      let firstName = user.firstName;
-      let lastName = user.lastName;
-      if (!firstName || !lastName) {
-        const parts = (user.name || "User Unknown").split(" ");
-        firstName = parts[0];
-        lastName = parts.slice(1).join(" ");
-      }
+      const firstName =
+        user.firstName || (user.name ? user.name.split(" ")[0] : "User");
+      const lastName =
+        user.lastName ||
+        (user.name ? user.name.split(" ").slice(1).join(" ") : "Unknown");
 
       const returnUrl = `https://edunet-1574d.web.app/course/${course.id}/content`;
       const cancelUrl = "https://edunet-1574d.web.app/course/payment-cancel";
 
+      // 🔑 identifiant de commande pour le webhook
+      const orderId = `${userId}_${course.id}`;
+
+
       // Appeler le backend Render
-      const paymentData = await PaymentModel.createPayment(
-        course.price,
-        `Achat du cours : ${course.title}`,
+      const paymentData = await PaymentModel.createPayment({
+        amount: course.price,
+        note: `Achat du cours : ${course.title}`,
         returnUrl,
         cancelUrl,
-        {
-          firstName,
-          lastName,
-          email: user.email,
-          phone: user.phone,
-          name: user.name,
-        }
-      );
+        firstName,
+        lastName,
+        email: user.email,
+        phone: user.phone || "+21600000000",
+        orderId,
+      });
 
       this.loading = false;
       return paymentData; 
