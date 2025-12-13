@@ -6,7 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 class PaymentViewModel {
   loading = false;
   error = null;
-  
+
   async startPayment(course, userId) {
     this.loading = true;
     this.error = null;
@@ -30,7 +30,6 @@ class PaymentViewModel {
       // 🔑 identifiant de commande pour le webhook
       const orderId = `${userId}_${course.id}`;
 
-
       // Appeler le backend Render
       const paymentData = await PaymentModel.createPayment({
         amount: course.price,
@@ -45,7 +44,7 @@ class PaymentViewModel {
       });
 
       this.loading = false;
-      return paymentData; 
+      return paymentData;
     } catch (err) {
       console.error("Erreur démarrage paiement :", err);
       this.loading = false;

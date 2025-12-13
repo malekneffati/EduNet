@@ -118,13 +118,6 @@ export default function useCourseDetailsViewModel(courseId) {
 
         // 🔑 information clé pour le webhook
         orderId: `${userId}_${course.id}`,
-
-        metadata: {
-          userId: userId,
-          courseId: course.id,
-          courseTitle: course.title,
-          email: user.email,
-        },
       };
 
       const response = await fetch(

@@ -5,11 +5,14 @@ import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
 
-
 const BASE_URL = "https://sandbox.paymee.tn/api/v2";
 
 const app = express();
 app.use(cors());
+// 🔑 OBLIGATOIRE pour Paymee webhook
+app.use(express.urlencoded({ extended: true }));
+
+// Pour les autres routes JSON
 app.use(express.json());
 
 app.post("/createPayment", async (req, res) => {
@@ -63,71 +66,83 @@ app.post("/createPayment", async (req, res) => {
   }
 });
 
-
 // Endpoint webhook Paymee
 app.post("/paymee/webhook", async (req, res) => {
   try {
     const payload = req.body;
 
-    console.log("Webhook reçu :", payload);
+    console.log("📩 Webhook Paymee reçu :", payload);
 
-    // 1️⃣ Vérifier que payload existe et contient l’ID
-    if (!payload || !payload.id) {
-      console.log("Webhook invalide :", payload);
+    /**
+     * 1️⃣ Vérifier que le payload existe
+     * Paymee envoie toujours payment_status (true / false)
+     */
+    if (!payload || typeof payload.payment_status === "undefined") {
+      console.log("❌ Webhook invalide (payload vide)");
       return res.status(200).send("OK");
     }
 
-    // 2️⃣ Vérification via API Paymee
-    const verifyResponse = await fetch(`${BASE_URL}/payments/${payload.id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${process.env.PAYMEE_API_KEY}`,
-      },
-    });
-
-    const verifyData = await verifyResponse.json();
-
-    if (!verifyResponse.ok || verifyData.status !== "SUCCESS") {
-      console.log("Paiement non confirmé par Paymee :", verifyData);
+    /**
+     * 2️⃣ Vérifier que le paiement est réussi
+     */
+    if (payload.payment_status !== true) {
+      console.log("❌ Paiement non réussi :", payload.payment_status);
       return res.status(200).send("OK");
     }
 
-    // 3️⃣ Extraire metadata
-    const { userId, courseId, courseTitle, email } = payload.metadata || {};
-    if (!userId || !courseId || !courseTitle || !email) {
-      console.error("Metadata manquante :", payload.metadata);
+    /**
+     * 3️⃣ Extraire userId et courseId depuis order_id
+     * Format attendu : userId_courseId
+     */
+    const orderId = payload.order_id;
+    if (!orderId || !orderId.includes("_")) {
+      console.error("❌ order_id invalide :", orderId);
       return res.status(200).send("OK");
     }
 
-    // 4️⃣ Créer myCourses dans Firestore
+    const [userId, courseId] = orderId.split("_");
+
+    /**
+     * 4️⃣ Récupérer email et titre du cours
+     * note = "Achat du cours : XXX"
+     */
+    const email = payload.email;
+    const courseTitle = payload.note || "Cours EduNet";
+
+    if (!email) {
+      console.error("❌ Email manquant dans le webhook");
+      return res.status(200).send("OK");
+    }
+
+    /**
+     * 5️⃣ Écrire dans Firestore (myCourses)
+     */
     const courseRef = db.doc(`users/${userId}/myCourses/${courseId}`);
     await courseRef.set({
       joinedAt: new Date(),
       progress: 0,
       paymentStatus: "paid",
+      transactionId: payload.transaction_id || null,
+      amount: payload.amount || null,
     });
 
-    console.log(`Accès créé pour user ${userId}, course ${courseId}`);
+    console.log(`✅ Accès créé : user=${userId}, course=${courseId}`);
 
-    // 5️⃣ Envoi email
+    /**
+     * 6️⃣ Envoyer l’email de confirmation
+     */
     await sendConfirmationEmail(email, courseTitle);
-    console.log(`Email de confirmation envoyé à ${payload.email}`);
+    console.log(`📧 Email envoyé à ${email}`);
 
-    // 6️⃣ Toujours répondre 200 OK
-    res.status(200).send("OK");
+    /**
+     * 7️⃣ Toujours répondre 200 à Paymee
+     */
+    return res.status(200).send("OK");
   } catch (err) {
-    console.error("Erreur webhook :", err);
-    res.status(500).send("Erreur serveur");
+    console.error("🔥 Erreur webhook Paymee :", err);
+    return res.status(500).send("Erreur serveur");
   }
 });
 
-
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log("Server running on port " + PORT));
-
-
-
-
-
-
