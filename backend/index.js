@@ -83,9 +83,17 @@ app.post("/paymee/webhook", async (req, res) => {
     }
 
     /**
-     * 2️⃣ Vérifier que le paiement est réussi
+     * 2️⃣ Normaliser le statut de paiement Paymee
+     * Paymee Sandbox envoie "True" / "False" (string)
      */
-    if (payload.payment_status !== true) {
+    const paymentSuccess =
+      payload.payment_status === true ||
+      payload.payment_status === "True" ||
+      payload.payment_status === "true" ||
+      payload.payment_status === 1 ||
+      payload.payment_status === "1";
+
+    if (!paymentSuccess) {
       console.log("❌ Paiement non réussi :", payload.payment_status);
       return res.status(200).send("OK");
     }
