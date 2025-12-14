@@ -9,12 +9,14 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db, auth } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const useCourseContentViewModel = (courseId) => {
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [allowed, setAllowed] = useState(null); // null = pas encore vérifié
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   // Reviews
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
@@ -22,7 +24,16 @@ const useCourseContentViewModel = (courseId) => {
   const [newComment, setNewComment] = useState("");
   const [sendingReview, setSendingReview] = useState(false);
 
-  const user = auth.currentUser;
+  // ------------------------------
+  // 0️⃣ Listen auth changes
+  // ------------------------------
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) setUser(user);
+      else setUser(null);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // ------------------------------
   // 1️⃣ FETCH COURSE DATA
@@ -63,10 +74,26 @@ const useCourseContentViewModel = (courseId) => {
       return;
     }
 
+    // 1️⃣ Cours gratuit
     if (course?.isFree) {
-      console.log("Course is free, access granted");
       setAllowed(true);
       return;
+    }
+
+    // 2️⃣ Vérifier achat dans myCourses
+    try {
+      const accessRef = doc(db, "users", user.uid, "myCourses", courseId);
+
+      const accessSnap = await getDoc(accessRef);
+
+      if (accessSnap.exists()) {
+        setAllowed(true);
+      } else {
+        setAllowed(false);
+      }
+    } catch (err) {
+      console.error("Erreur checkAccess:", err);
+      setAllowed(false);
     }
   };
 

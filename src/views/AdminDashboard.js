@@ -12,6 +12,8 @@ import { FaUsers, FaBook, FaDollarSign, FaCrown } from "react-icons/fa";
 import useAdminDashboardViewModel, {
   getStats,
 } from "../viewmodels/admin/AdminDashboardViewModel";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 const AdminDashboard = () => {
   const { activeSection, setActiveSection } = useAdminDashboardViewModel();
@@ -23,12 +25,24 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    const loadStats = async () => {
-      const result = await getStats();
-      setStats(result);
-    };
-    loadStats();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const result = await getStats();
+        setStats(result);
+      } else {
+        // reset important pour éviter les données fantômes
+        setStats({
+          totalUsers: 0,
+          totalCourses: 0,
+          totalRevenue: 0,
+          totalSales: 0,
+        });
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
+
 
   const renderSection = () => {
     switch (activeSection) {

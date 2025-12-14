@@ -11,8 +11,11 @@ import Catalog from "./views/Catalog";
 import CourseDetails from "./views/CourseDetails";
 import CourseContent from "./views/CourseContent";
 import SubscriptionsPage from "./views/SubscriptionsPage";
+import { setPersistence, browserLocalPersistence } from "firebase/auth";
+import { auth } from "./firebase";
 
 function App() {
+  setPersistence(auth, browserLocalPersistence);
   const [role, setRole] = React.useState(localStorage.getItem("role") || null);
   const updateRole = (newRole) => {
     localStorage.setItem("role", newRole);

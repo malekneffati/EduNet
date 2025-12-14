@@ -12,20 +12,41 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import {
+  setPersistence,
+  browserLocalPersistence,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 export default function useCourseDetailsViewModel(courseId) {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
+  const [user, setUser] = useState(null);
   const [canAccessCourse, setCanAccessCourse] = useState(false);
 
-  const user = auth.currentUser;
-  const userId = user ? user.uid : null;
+  // 1️⃣ Auth persistante + user state
+  useEffect(() => {
+    const initAuth = async () => {
+      await setPersistence(auth, browserLocalPersistence);
 
-  // Charger le cours
+      const unsubscribe = onAuthStateChanged(auth, (u) => {
+        setUser(u || null);
+      });
+
+      return () => unsubscribe();
+    };
+
+    initAuth();
+  }, []);
+
+  const userId = user?.uid || null;
+
+  // 2️⃣ Charger le cours
   useEffect(() => {
     const fetchCourse = async () => {
+      setLoading(true);
       try {
         const snap = await getDoc(doc(db, "courses", courseId));
         if (snap.exists()) setCourse({ id: snap.id, ...snap.data() });
@@ -40,10 +61,11 @@ export default function useCourseDetailsViewModel(courseId) {
     fetchCourse();
   }, [courseId]);
 
-  // Charger les reviews
+  // 3️⃣ Charger reviews
   useEffect(() => {
+    if (!course || course === "not_found") return;
+
     const fetchReviews = async () => {
-      if (!course) return;
       try {
         const q = query(
           collection(db, "courses", courseId, "reviews"),
@@ -55,12 +77,42 @@ export default function useCourseDetailsViewModel(courseId) {
         console.error("Erreur reviews:", err);
       }
     };
+
     fetchReviews();
   }, [course, courseId]);
 
+  // 4️⃣ Vérification accès
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!user || !course) {
+        setCanAccessCourse(false);
+        return;
+      }
+
+      if (course.isFree) {
+        setCanAccessCourse(true);
+        return;
+      }
+
+      try {
+        const accessSnap = await getDoc(
+          doc(db, "users", user.uid, "myCourses", courseId)
+        );
+        setCanAccessCourse(accessSnap.exists());
+      } catch (err) {
+        console.error("Erreur checkAccess:", err);
+        setCanAccessCourse(false);
+      }
+    };
+
+    checkAccess();
+  }, [user, course, courseId]);
+
   const averageRating =
     reviews.length > 0
-      ? (reviews.reduce((a, b) => a + b.rating, 0) / reviews.length).toFixed(1)
+      ? (
+          reviews.reduce((a, b) => a + (b.rating || 0), 0) / reviews.length
+        ).toFixed(1)
       : 0;
 
   const joinCourse = async () => {
@@ -132,5 +184,6 @@ export default function useCourseDetailsViewModel(courseId) {
     joinCourse,
     handlePayment,
     canAccessCourse,
+    user,
   };
 }

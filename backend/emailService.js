@@ -49,7 +49,7 @@ export async function sendConfirmationEmail(toEmail, courseTitle) {
 
             <tr>
               <td align="center" style="padding:30px 0;">
-                <a href="https://edunet.tn/my-courses"
+                <a href="https://edunet-1574d.web.app/dashboard"
                   style="background:#2563eb; color:#ffffff; text-decoration:none;
                          padding:12px 24px; border-radius:6px;
                          font-weight:bold; display:inline-block;">

@@ -42,6 +42,10 @@ const CourseContent = () => {
   if (course === "error")
     return <p className="text-center p-8">Erreur de chargement.</p>;
 
+  if (allowed === null) {
+    return <p className="p-8 text-center">Vérification de l’accès...</p>;
+  }
+
   if (!allowed)
     return (
       <div className="p-8 text-center">
