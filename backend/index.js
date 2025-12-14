@@ -1,5 +1,5 @@
 // EduNet/backend/index.js
-import { db } from "./firebaseAdmin.js"; 
+import { db } from "./firebaseAdmin.js";
 import { sendConfirmationEmail } from "./emailService.js";
 import express from "express";
 import fetch from "node-fetch";
@@ -112,6 +112,18 @@ app.post("/paymee/webhook", async (req, res) => {
     });
 
     console.log(`✅ Accès créé : user=${userId}, course=${courseId}`);
+
+    const paiementRef = db.collection("paiements").doc();
+
+    await paiementRef.set({
+      userId: userId,
+      userName: payload.userName || "Utilisateur",
+      courseId: courseId,
+      courseTitle: payload.courseTitle,
+      montant: payload.amount || 0,
+      transactionId: payload.transaction_id || null,
+      date: new Date(),
+    });
 
     await sendConfirmationEmail(email, courseTitle);
     console.log(`📧 Email envoyé à ${email}`);

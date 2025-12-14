@@ -33,7 +33,7 @@ const MonthlySalesDualChart = () => {
       const paiementsRef = collection(db, "paiements");
       const snap = await getDocs(paiementsRef);
 
-      const salesPerMonth = {}; // { "YYYY-MM": { revenue: X, count: Y } }
+      const salesPerMonth = {};
 
       snap.forEach((doc) => {
         const data = doc.data();

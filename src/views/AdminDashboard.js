@@ -1,17 +1,34 @@
 // src/pages/AdminDashboard.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import StatCard from "../components/admin/StatCard";
 import UserManagement from "../components/admin/UserManagement";
 import CourseManagement from "../components/admin/CourseManagement";
 import PaymentList from "../components/admin/PaymentList";
-import { FaUsers, FaBook, FaDollarSign, FaCrown } from "react-icons/fa";
-import useAdminDashboardViewModel from "../viewmodels/admin/AdminDashboardViewModel";
 import AdminSubscriptions from "../components/admin/Subscription";
+import MonthlySalesDualChart from "../components/admin/MonthlySalesDualChart";
+import { FaUsers, FaBook, FaDollarSign, FaCrown } from "react-icons/fa";
+import useAdminDashboardViewModel, {
+  getStats,
+} from "../viewmodels/admin/AdminDashboardViewModel";
 
 const AdminDashboard = () => {
   const { activeSection, setActiveSection } = useAdminDashboardViewModel();
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalCourses: 0,
+    totalRevenue: 0,
+    totalSales: 0,
+  });
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const result = await getStats();
+      setStats(result);
+    };
+    loadStats();
+  }, []);
 
   const renderSection = () => {
     switch (activeSection) {
@@ -22,45 +39,35 @@ const AdminDashboard = () => {
             <div className="grid md:grid-cols-4 gap-6 mb-8">
               <StatCard
                 icon={<FaUsers />}
-                value="1,234"
+                value={stats.totalUsers}
                 label="Utilisateurs totaux"
                 color="blue"
               />
               <StatCard
                 icon={<FaBook />}
-                value="45"
+                value={stats.totalCourses}
                 label="Cours disponibles"
                 color="green"
               />
               <StatCard
                 icon={<FaDollarSign />}
-                value="12,450"
+                value={stats.totalRevenue.toLocaleString()}
                 label="Revenus (TND)"
                 color="purple"
               />
               <StatCard
                 icon={<FaCrown />}
-                value="567"
-                label="Abonnements actifs"
+                value={stats.totalSales}
+                label="Ventes totales"
                 color="orange"
               />
             </div>
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-1 gap-8">
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4">
+                <h3 className="text-lg font-semibold mb-4 text-center">
                   Ventes mensuelles
                 </h3>
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-                  Graphique des ventes
-                </div>
-              </div>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold mb-4">
-                  Activité des utilisateurs
-                </h3>
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-                  Graphique d'activité
-                </div>
+                <MonthlySalesDualChart />
               </div>
             </div>
           </>
