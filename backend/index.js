@@ -115,11 +115,12 @@ app.post("/paymee/webhook", async (req, res) => {
 
     const paiementRef = db.collection("paiements").doc();
 
+    const firstName = payload.firstName || "User";
+    const lastName = payload.lastName || "Unknown";
+
     await paiementRef.set({
       userId: userId,
-      userName:
-        `${payload.first_name || ""} ${payload.last_name || ""}`.trim() ||
-        "Utilisateur",
+      userName: `${firstName} ${lastName}`.trim(),
       courseId: courseId,
       courseTitle: courseTitle,
       montant: Number(payload.amount) || 0,

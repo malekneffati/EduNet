@@ -141,11 +141,13 @@ export default function useCourseDetailsViewModel(courseId) {
     }
 
     try {
+      const firstName = user.displayName || "User";
+      const lastName = user.lastName || "Unknown";
       const body = {
         amount: course.price,
         note: `Achat du cours : ${course.title}`,
-        firstName: user.displayName || "User",
-        lastName: user.lastName || "Unknown",
+        firstName,
+        lastName,
         email: user.email,
         phone: user.phone || "+21600000000",
         returnUrl: `https://edunet-1574d.web.app/course/${course.id}/content`,
